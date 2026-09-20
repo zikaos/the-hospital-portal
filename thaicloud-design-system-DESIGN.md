@@ -1,7 +1,6 @@
 # ThaiCloud
 
-## Overview
-An editorial precision interface for a community platform where developers discover, share, and download design system files. The aesthetic is quietly confident — bold display typography, generous spacing, and gallery-frame card surfaces. The mood is professional and modern without being sterile. High information density balanced by breathing room. 
+A clinical interface for a hospital portal serving patients and medical staff. The layout pairs bold display typography, 4px grid spacing, and bordered card surfaces. High information density balanced by breathing room. 
 
 ## Colors
 Mapped from the official brand swatches (PMS-matched). Blue replaces indigo as the single interactive accent; teal is the brand/secondary highlight; orange/gold/teal carry the semantic states.
@@ -63,13 +62,13 @@ This design uses minimal shadows. Cards rest flat with a 1px border and gain a s
 - 9999px: Avatars, status dots, pill badges
 
 ## Do's and Don'ts
-- Do use blue (#0671B8) only for interactive elements — never for decoration or static text
-- Do maintain the 4px spacing grid for all padding, margins, and gaps
-- Do use Kanit for both headings and body, and JetBrains Mono for code — never set code in Kanit
-- Do keep kit cards at 12px radius and buttons/inputs at 6px — don't mix these values
-- Do provide sufficient contrast in both light and dark modes — test both
-- Don't use pure black (#000000) or pure white (#FFFFFF) for text — use the defined palette values
-- Don't add decorative gradients or illustrations — the interactive dot grid is the only decorative element
-- Don't use shadows on static elements — reserve shadow elevation for hover and focus states
-- Don't use more than two font weights on a single screen
-- Don't place more than one primary (filled blue) button in the same view section
+- Do use blue (#0671B8) only for interactive elements; never for decoration or static text.
+- Do maintain the 4px spacing grid for all padding, margins, and gaps.
+- Do use Kanit for both headings and body, and JetBrains Mono for code; never set code in Kanit.
+- Do keep kit cards at 12px radius and buttons/inputs at 6px; do not mix these values.
+- Do provide sufficient contrast in both light and dark modes; test both.
+- Don't use pure black (#000000) or pure white (#FFFFFF) for text; use the defined palette values.
+- Don't add decorative gradients or illustrations; the interactive dot grid is the only decorative element.
+- Don't use shadows on static elements; reserve shadow elevation for hover and focus states.
+- Don't use more than two font weights on a single screen.
+- Don't place more than one primary (filled blue) button in the same view section.

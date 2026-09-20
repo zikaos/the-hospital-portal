@@ -5,8 +5,8 @@ A modern clinical **Hospital Portal** built with Next.js 14 (App Router), TypeSc
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ### Documentation & Guides
-- **[Non-Technical User & Patient Guide (PDF)](docs/The_Hospital_Portal_User_Guide.pdf)** — Step-by-step patient journey, appointment scheduling, and FAQ.
-- **[Technical Architecture & Workflow Specification (PDF)](docs/The_Hospital_Portal_Technical_Architecture.pdf)** — System topology, PostgreSQL RLS model, dual-mode persistence, and security controls.
+- **[Non-Technical User & Patient Guide (PDF)](docs/The_Hospital_Portal_User_Guide.pdf)**: Step-by-step patient journey, appointment scheduling, and FAQ.
+- **[Technical Architecture & Workflow Specification (PDF)](docs/The_Hospital_Portal_Technical_Architecture.pdf)**: System topology, PostgreSQL RLS model, dual-mode persistence, and security controls.
 
 ---
 
@@ -37,7 +37,7 @@ A modern clinical **Hospital Portal** built with Next.js 14 (App Router), TypeSc
 | **Styling** | Tailwind CSS + Accessible Primitives | Medical-grade styling with accessible tap targets, contrast ratios, and clean card layouts. |
 | **Icons** | Lucide React | Standard, clinical icon set. |
 | **Backend / DB** | Supabase (PostgreSQL + Auth + Storage) | Integrated RLS security policies, auth sessions, and bucket storage. |
-| **Demo Mode** | Dual-Engine Provider (`lib/api.ts`) | Works seamlessly out-of-the-box in standalone demo mode, or connects to live Supabase cloud. |
+| **Demo Mode** | Dual-Engine Provider (`lib/api.ts`) | Works out of the box in standalone demo mode, or connects to live Supabase cloud. |
 
 ---
 
