@@ -5,16 +5,13 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Activity,
   Calendar,
   FileText,
   Pill,
-  User,
   ArrowRight,
-  Clock,
-  ShieldCheck,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -35,17 +32,31 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <Link href="/patient/dashboard">
-              <Button variant="ghost" size="sm" className="text-xs">
-                Patient Portal
+          <div className="flex items-center gap-3">
+            {user ? (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => router.push(user.role === 'staff' ? '/staff/dashboard' : '/patient/dashboard')}
+                className="gap-1.5"
+              >
+                Go to Dashboard
+                <ArrowRight className="h-3.5 w-3.5" />
               </Button>
-            </Link>
-            <Link href="/staff/dashboard">
-              <Button variant="primary" size="sm" className="text-xs">
-                Staff Portal
-              </Button>
-            </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" size="sm">
+                    Sign in
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button variant="primary" size="sm">
+                    Create account
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -53,30 +64,40 @@ export default function LandingPage() {
       {/* Hero Section */}
       <main className="flex-1 max-w-[1280px] mx-auto px-6 py-12 md:py-16 w-full flex flex-col justify-center">
         <div className="max-w-2xl mb-12">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-[6px] bg-[#0671B8]/10 text-[#0671B8] text-xs font-semibold mb-4 border border-[#0671B8]/20">
-            Interactive Prototype Mode Active
-          </div>
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#0A0A0A] tracking-tight leading-tight">
-            Clinical visits, health records, and prescription management.
+            Manage your healthcare visits, records, and prescriptions.
           </h1>
           <p className="mt-4 text-[15px] text-[#6B6B6B] leading-relaxed">
-            Welcome to The Hospital Portal. Explore both the patient and clinical staff portals directly with zero login required.
+            Welcome to The Hospital Portal. Schedule consultations with your doctor, view diagnostic lab results, and check your current medications anytime.
           </p>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <Link href="/patient/dashboard">
-              <Button variant="primary" size="default" className="gap-2">
-                Enter Patient Portal
+          {user ? (
+            <div className="mt-6">
+              <Button
+                variant="primary"
+                size="default"
+                className="gap-2"
+                onClick={() => router.push(user.role === 'staff' ? '/staff/dashboard' : '/patient/dashboard')}
+              >
+                Continue as {user.full_name}
                 <ArrowRight className="h-4 w-4" />
               </Button>
-            </Link>
-            <Link href="/staff/dashboard">
-              <Button variant="outline" size="default" className="gap-2 border-[#0671B8] text-[#0671B8] hover:bg-[#0671B8]/5">
-                Enter Staff Portal
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
+            </div>
+          ) : (
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link href="/login">
+                <Button variant="primary" size="default" className="gap-2">
+                  Sign in to your account
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/signup">
+                <Button variant="secondary" size="default">
+                  New patient registration
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Features Grid */}

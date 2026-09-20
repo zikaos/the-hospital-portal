@@ -282,8 +282,13 @@ let protoNotifications: Notification[] = [
 // -----------------------------------------------------------------------------
 
 export async function getCurrentUser(): Promise<AuthSession['user']> {
-  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/staff')) {
-    return PROTOTYPE_STAFF_USER;
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('portal_session');
+      if (raw) return JSON.parse(raw);
+    } catch {
+      // Fallback
+    }
   }
   return PROTOTYPE_PATIENT_USER;
 }
@@ -321,7 +326,7 @@ export async function signUp(
 }
 
 export async function logout(): Promise<void> {
-  // Prototype mode: no-op
+  // Managed by AuthContext
 }
 
 // -----------------------------------------------------------------------------
@@ -329,12 +334,20 @@ export async function logout(): Promise<void> {
 // -----------------------------------------------------------------------------
 
 export async function getMyProfile(): Promise<PatientProfile> {
-  if (isSupabaseConfigured()) {
+  if (typeof window !== 'undefined') {
     try {
-      const { data } = await supabase.from('profiles').select('*, patient_details:patients(*)').maybeSingle();
-      if (data) return data;
+      const raw = localStorage.getItem('portal_session');
+      if (raw) {
+        const u = JSON.parse(raw);
+        return {
+          ...protoProfile,
+          id: u.id,
+          email: u.email,
+          full_name: u.full_name,
+        };
+      }
     } catch {
-      // Fall through to prototype profile
+      // Fallback
     }
   }
   return protoProfile;
@@ -356,31 +369,14 @@ export async function updateMyProfile(
 // -----------------------------------------------------------------------------
 
 export async function getMyAppointments(): Promise<Appointment[]> {
-  if (isSupabaseConfigured()) {
-    try {
-      const { data } = await supabase
-        .from('appointments')
-        .select('*, staff:staff_id(profiles(full_name), title, specialty)')
-        .order('scheduled_at', { ascending: false });
+  const current = await getCurrentUser();
+  const currentId = current?.id || PROTOTYPE_PATIENT_USER.id;
+  const isDemoPatient = currentId === PROTOTYPE_PATIENT_USER.id;
 
-      if (data && data.length > 0) {
-        return data.map((item: any) => ({
-          ...item,
-          staff: item.staff
-            ? {
-                full_name: item.staff.profiles?.full_name || 'Clinic Physician',
-                title: item.staff.title,
-                specialty: item.staff.specialty,
-              }
-            : undefined,
-        }));
-      }
-    } catch {
-      // Fall through
-    }
+  if (isDemoPatient) {
+    return protoAppointments.filter((a) => a.patient_id === PROTOTYPE_PATIENT_USER.id);
   }
-
-  return protoAppointments.filter((a) => a.patient_id === PROTOTYPE_PATIENT_USER.id);
+  return protoAppointments.filter((a) => a.patient_id === currentId);
 }
 
 export async function createAppointment(
@@ -388,20 +384,25 @@ export async function createAppointment(
   reason: string,
   staffId?: string
 ): Promise<{ success: boolean; appointment?: Appointment; error?: string }> {
+  const current = await getCurrentUser();
+  const patientId = current?.id || PROTOTYPE_PATIENT_USER.id;
+  const patientName = current?.full_name || protoProfile.full_name;
+  const patientEmail = current?.email || protoProfile.email;
+
   const staff = protoStaffList.find((s) => s.id === staffId) || protoStaffList[0];
 
   const newApt: Appointment = {
     id: `apt-${Date.now()}`,
-    patient_id: PROTOTYPE_PATIENT_USER.id,
+    patient_id: patientId,
     staff_id: staff.id,
     scheduled_at: scheduledAt,
     reason,
     status: 'pending',
     created_at: new Date().toISOString(),
     patient: {
-      full_name: protoProfile.full_name,
+      full_name: patientName,
       phone: protoProfile.phone,
-      email: protoProfile.email,
+      email: patientEmail,
     },
     staff: {
       full_name: staff.full_name,
@@ -414,8 +415,8 @@ export async function createAppointment(
 
   protoNotifications.unshift({
     id: `notif-${Date.now()}`,
-    user_id: PROTOTYPE_PATIENT_USER.id,
-    message: `Appointment request submitted for ${new Date(scheduledAt).toLocaleString()}.`,
+    user_id: patientId,
+    message: `Consultation booked with ${staff.full_name} for ${scheduledAt.replace('T', ' ')}.`,
     is_read: false,
     created_at: new Date().toISOString(),
   });
