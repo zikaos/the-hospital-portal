@@ -94,6 +94,20 @@ alter table medical_records enable row level security;
 alter table prescriptions enable row level security;
 alter table notifications enable row level security;
 
+-- Helper function to avoid RLS recursion on profiles table
+create or replace function public.is_staff()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select coalesce(
+    (select role = 'staff' from public.profiles where id = auth.uid()),
+    false
+  );
+$$;
+
 -- Profiles: users read own profile, staff can read profiles to see patient names
 drop policy if exists "users read own profile" on profiles;
 create policy "users read own profile" on profiles
@@ -101,13 +115,11 @@ create policy "users read own profile" on profiles
 
 drop policy if exists "staff read all profiles" on profiles;
 create policy "staff read all profiles" on profiles
-  for select using (
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
-  );
+  for select using (public.is_staff());
 
 drop policy if exists "users insert own profile" on profiles;
 create policy "users insert own profile" on profiles
-  for insert with check (id = auth.uid());
+  for insert with check (id = auth.uid() and role = 'patient');
 
 drop policy if exists "users update own profile" on profiles;
 create policy "users update own profile" on profiles
@@ -128,9 +140,7 @@ create policy "patients update own patient row" on patients
 
 drop policy if exists "staff read all patients" on patients;
 create policy "staff read all patients" on patients
-  for select using (
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
-  );
+  for select using (public.is_staff());
 
 -- Staff: everyone can view staff directory (e.g. for booking doctor selection)
 drop policy if exists "anyone read staff directory" on staff;
@@ -152,15 +162,11 @@ create policy "patients cancel own appointments" on appointments
 
 drop policy if exists "staff read all appointments" on appointments;
 create policy "staff read all appointments" on appointments
-  for select using (
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
-  );
+  for select using (public.is_staff());
 
 drop policy if exists "staff update appointments" on appointments;
 create policy "staff update appointments" on appointments
-  for update using (
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
-  );
+  for update using (public.is_staff());
 
 -- Medical records & prescriptions: patient read-only own, staff full access
 drop policy if exists "patients read own records" on medical_records;
@@ -169,9 +175,7 @@ create policy "patients read own records" on medical_records
 
 drop policy if exists "staff manage records" on medical_records;
 create policy "staff manage records" on medical_records
-  for all using (
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
-  );
+  for all using (public.is_staff());
 
 drop policy if exists "patients read own prescriptions" on prescriptions;
 create policy "patients read own prescriptions" on prescriptions
@@ -179,9 +183,7 @@ create policy "patients read own prescriptions" on prescriptions
 
 drop policy if exists "staff manage prescriptions" on prescriptions;
 create policy "staff manage prescriptions" on prescriptions
-  for all using (
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
-  );
+  for all using (public.is_staff());
 
 -- Notifications: everyone reads and marks read only their own
 drop policy if exists "read own notifications" on notifications;
@@ -201,18 +203,21 @@ insert into storage.buckets (id, name, public)
 values ('medical-files', 'medical-files', false)
 on conflict (id) do nothing;
 
+drop policy if exists "Staff upload medical files" on storage.objects;
 create policy "Staff upload medical files" on storage.objects
   for insert with check (
     bucket_id = 'medical-files' and
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
+    public.is_staff()
   );
 
+drop policy if exists "Staff manage medical files" on storage.objects;
 create policy "Staff manage medical files" on storage.objects
   for all using (
     bucket_id = 'medical-files' and
-    exists (select 1 from profiles where id = auth.uid() and role = 'staff')
+    public.is_staff()
   );
 
+drop policy if exists "Patients read assigned medical files" on storage.objects;
 create policy "Patients read assigned medical files" on storage.objects
   for select using (
     bucket_id = 'medical-files' and
