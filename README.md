@@ -5,14 +5,14 @@ A modern clinical **Hospital Portal** built with Next.js 14 (App Router), TypeSc
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ### Documentation & Guides
-- 📄 **[Non-Technical User & Patient Guide (PDF)](docs/The_Hospital_Portal_User_Guide.pdf)** — Step-by-step patient journey, appointment scheduling, and FAQ.
-- 📐 **[Technical Architecture & Workflow Specification (PDF)](docs/The_Hospital_Portal_Technical_Architecture.pdf)** — System topology, PostgreSQL RLS model, dual-mode persistence, and security controls.
+- **[Non-Technical User & Patient Guide (PDF)](docs/The_Hospital_Portal_User_Guide.pdf)** — Step-by-step patient journey, appointment scheduling, and FAQ.
+- **[Technical Architecture & Workflow Specification (PDF)](docs/The_Hospital_Portal_Technical_Architecture.pdf)** — System topology, PostgreSQL RLS model, dual-mode persistence, and security controls.
 
 ---
 
 ## 1. Features Overview
 
-### 👤 Patient Self-Service
+### Patient Self-Service
 - **Authentication**: Sign up and login with role-isolated credentials.
 - **Demographic & Clinical Profile**: Update contact details, emergency contacts, and insurance provider/policy ID (`/patient/profile`).
 - **Appointment Scheduling**: Real-time consultation booking with date/time pickers and clinician selection; instant cancellation with status tracking (`/patient/appointments`).
@@ -20,7 +20,7 @@ A modern clinical **Hospital Portal** built with Next.js 14 (App Router), TypeSc
 - **Prescriptions & Regimen**: Clear categorization between active medications and completed courses (`/patient/prescriptions`).
 - **In-App Notifications**: Real-time updates whenever appointment statuses change or records are uploaded.
 
-### 🩺 Staff Clinical Workspace
+### Staff Clinical Workspace
 - **Triage Appointment Queue**: Live queue for today's visits with 1-click status actions: **Confirm**, **Complete**, or **Cancel** (`/staff/dashboard`).
 - **Searchable Patient Directory**: Fast lookup across patient names, telephone numbers, and insurance policies (`/staff/patients`).
 - **Comprehensive Patient Chart**: Unified view of patient demographics, medical history, records, and prescriptions (`/staff/patients/[id]`).

@@ -22,10 +22,10 @@
 
 | Feature | What It Does | Who Uses It |
 |---|---|---|
-| **📅 24/7 Appointment Scheduling** | Browse attending physicians by specialty (Cardiology, Pediatrics, General Practice), select preferred time slots, and submit booking requests. | Patients & Clinical Staff |
-| **🧪 Diagnostic Records & Lab Results** | Instant access to completed blood counts, imaging summaries, doctor notes, and follow-up recommendations. | Patients & Attending Physicians |
-| **💊 Medication & Prescription Tracking** | View active medications, precise dosages, refill dates, and prescribing physician notes. | Patients & Pharmacists/Doctors |
-| **🛡️ Health Profile & Emergency Care** | Update blood type, known allergies, insurance carrier ID, and emergency contact details. | Patients & Care Teams |
+| **24/7 Appointment Scheduling** | Browse attending physicians by specialty (Cardiology, Pediatrics, General Practice), select preferred time slots, and submit booking requests. | Patients & Clinical Staff |
+| **Diagnostic Records & Lab Results** | Instant access to completed blood counts, imaging summaries, doctor notes, and follow-up recommendations. | Patients & Attending Physicians |
+| **Medication & Prescription Tracking** | View active medications, precise dosages, refill dates, and prescribing physician notes. | Patients & Pharmacists/Doctors |
+| **Health Profile & Emergency Care** | Update blood type, known allergies, insurance carrier ID, and emergency contact details. | Patients & Care Teams |
 
 ---
 
