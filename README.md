@@ -1,8 +1,12 @@
-# ApexCare Patient Portal Prototype
+# The Hospital Portal
 
-A web-based **Patient Portal Prototype** built with Next.js 14 (App Router), TypeScript, Tailwind CSS, and a Supabase backend architecture with Row Level Security (RLS).
+A modern clinical **Hospital Portal** built with Next.js 14 (App Router), TypeScript, Tailwind CSS (ThaiCloud Design System), and a Supabase PostgreSQL backend architecture with Row Level Security (RLS).
 
-Designed with clean, functional, accessible clinical UI patterns tailored for job interviews and live product demonstrations.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+### Documentation & Guides
+- 📄 **[Non-Technical User & Patient Guide (PDF)](docs/The_Hospital_Portal_User_Guide.pdf)** — Step-by-step patient journey, appointment scheduling, and FAQ.
+- 📐 **[Technical Architecture & Workflow Specification (PDF)](docs/The_Hospital_Portal_Technical_Architecture.pdf)** — System topology, PostgreSQL RLS model, dual-mode persistence, and security controls.
 
 ---
 
