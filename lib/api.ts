@@ -105,17 +105,44 @@ export interface AuthSession {
 // AUTH OPERATIONS
 // -----------------------------------------------------------------------------
 
+async function ensureProfile(user: any): Promise<Profile | null> {
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (profile) return profile;
+
+  // Auto-heal missing profile (e.g. signup when email confirmation was pending)
+  const role = (user.user_metadata?.role as Role) || 'patient';
+  const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+
+  const { data: created, error } = await supabase
+    .from('profiles')
+    .insert({
+      id: user.id,
+      role,
+      full_name: fullName,
+    })
+    .select('*')
+    .maybeSingle();
+
+  if (error || !created) return null;
+
+  if (role === 'patient') {
+    await supabase.from('patients').upsert({ id: user.id });
+  }
+
+  return created;
+}
+
 export async function getCurrentUser(): Promise<AuthSession['user'] | null> {
   if (isSupabaseConfigured()) {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error || !user) return null;
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .single();
-
+    const profile = await ensureProfile(user);
     if (!profile) return null;
 
     return {
@@ -162,13 +189,8 @@ export async function login(
       return { user: null as any, error: error.message };
     }
 
-    const { data: profile, error: profileErr } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
-
-    if (profileErr || !profile) {
+    const profile = await ensureProfile(data.user);
+    if (!profile) {
       return { user: null as any, error: 'User profile not found in system.' };
     }
 

@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { getCurrentUser, login as apiLogin, loginStaff as apiLoginStaff, signUp as apiSignUp, logout as apiLogout, setDemoUser } from './api';
+import { supabase, isSupabaseConfigured } from './supabase';
 import { Role } from './types';
 import { INITIAL_PATIENT_PROFILES, INITIAL_STAFF_PROFILES } from './mock-data';
 
@@ -32,18 +33,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
+    function handleTokenRedirect(u: UserSession | null) {
+      if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname);
+        if (u) {
+          router.push(u.role === 'staff' ? '/staff/dashboard' : '/patient/dashboard');
+        }
+      }
+    }
+
     async function loadUser() {
       try {
         const u = await getCurrentUser();
         setUser(u);
+        handleTokenRedirect(u);
       } catch (err) {
         console.error('Error loading session:', err);
       } finally {
         setLoading(false);
       }
     }
+
     loadUser();
-  }, []);
+
+    if (isSupabaseConfigured()) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+          const u = await getCurrentUser();
+          setUser(u);
+          handleTokenRedirect(u);
+        } else if (event === 'SIGNED_OUT') {
+          setUser(null);
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [router]);
 
   // Patient Login (Rejects Staff)
   const login = async (email: string, password?: string) => {
