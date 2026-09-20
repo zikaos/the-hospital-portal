@@ -153,6 +153,12 @@ export async function login(
     });
 
     if (error) {
+      if (error.message.toLowerCase().includes('email not confirmed')) {
+        return {
+          user: null as any,
+          error: 'Email address has not been confirmed. Please check your verification link or confirm the user in Supabase.',
+        };
+      }
       return { user: null as any, error: error.message };
     }
 
