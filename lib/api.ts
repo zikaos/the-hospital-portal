@@ -132,6 +132,12 @@ async function ensureProfile(user: any): Promise<Profile | null> {
 
   if (role === 'patient') {
     await supabase.from('patients').upsert({ id: user.id });
+  } else if (role === 'staff') {
+    await supabase.from('staff').upsert({
+      id: user.id,
+      title: user.user_metadata?.title || 'Staff Physician',
+      specialty: user.user_metadata?.specialty || 'General Medicine',
+    });
   }
 
   return created;
@@ -339,7 +345,8 @@ export async function signUp(
   password?: string,
   fullName?: string,
   role: Role = 'patient',
-  staffPasscode?: string
+  staffPasscode?: string,
+  staffDetails?: { title?: string; specialty?: string }
 ): Promise<{ user: AuthSession['user']; error?: string }> {
   const name = fullName || email.split('@')[0];
 
@@ -348,7 +355,7 @@ export async function signUp(
     if (staffPasscode !== CLINIC_STAFF_PASSCODE) {
       return {
         user: null as any,
-        error: 'Unauthorized. Staff accounts can only be provisioned by administrators with a valid Clinic Passcode.',
+        error: 'Unauthorized. Staff accounts can only be provisioned with a valid Clinic Passcode.',
       };
     }
   }
@@ -361,6 +368,8 @@ export async function signUp(
         data: {
           full_name: name,
           role,
+          title: staffDetails?.title || 'Staff Physician',
+          specialty: staffDetails?.specialty || 'General Medicine',
         },
       },
     });
@@ -374,7 +383,7 @@ export async function signUp(
     }
 
     // Insert into profiles
-    const { error: profileError } = await supabase.from('profiles').insert({
+    const { error: profileError } = await supabase.from('profiles').upsert({
       id: data.user.id,
       role,
       full_name: name,
@@ -384,10 +393,16 @@ export async function signUp(
       console.warn('Profile insert note:', profileError.message);
     }
 
-    // If patient, insert initial patient row
+    // If patient, insert initial patient row; if staff, insert staff row
     if (role === 'patient') {
-      await supabase.from('patients').insert({
+      await supabase.from('patients').upsert({
         id: data.user.id,
+      });
+    } else if (role === 'staff') {
+      await supabase.from('staff').upsert({
+        id: data.user.id,
+        title: staffDetails?.title || 'Staff Physician',
+        specialty: staffDetails?.specialty || 'General Medicine',
       });
     }
 
@@ -429,6 +444,21 @@ export async function signUp(
       created_at: new Date().toISOString(),
     });
     setStored(PATIENTS_KEY, patients);
+  } else if (role === 'staff') {
+    INITIAL_STAFF_PROFILES.push({
+      id: newId,
+      role: 'staff',
+      full_name: name,
+      email,
+      phone: '',
+      created_at: new Date().toISOString(),
+      staff_details: {
+        id: newId,
+        title: staffDetails?.title || 'Staff Physician',
+        specialty: staffDetails?.specialty || 'General Medicine',
+        created_at: new Date().toISOString(),
+      },
+    });
   }
 
   setStored(AUTH_USER_KEY, sessionUser);

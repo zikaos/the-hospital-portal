@@ -119,7 +119,7 @@ create policy "staff read all profiles" on profiles
 
 drop policy if exists "users insert own profile" on profiles;
 create policy "users insert own profile" on profiles
-  for insert with check (id = auth.uid() and role = 'patient');
+  for insert with check (id = auth.uid());
 
 drop policy if exists "users update own profile" on profiles;
 create policy "users update own profile" on profiles
@@ -142,10 +142,18 @@ drop policy if exists "staff read all patients" on patients;
 create policy "staff read all patients" on patients
   for select using (public.is_staff());
 
--- Staff: everyone can view staff directory (e.g. for booking doctor selection)
+-- Staff: everyone can view staff directory, staff can insert/update own record
 drop policy if exists "anyone read staff directory" on staff;
 create policy "anyone read staff directory" on staff
   for select using (auth.role() = 'authenticated');
+
+drop policy if exists "staff insert own row" on staff;
+create policy "staff insert own row" on staff
+  for insert with check (id = auth.uid());
+
+drop policy if exists "staff update own row" on staff;
+create policy "staff update own row" on staff
+  for update using (id = auth.uid());
 
 -- Appointments: patient sees own, staff sees all
 drop policy if exists "patients read own appointments" on appointments;
@@ -223,3 +231,46 @@ create policy "Patients read assigned medical files" on storage.objects
     bucket_id = 'medical-files' and
     auth.role() = 'authenticated'
   );
+
+-- ==============================================================================
+-- 8. AUTOMATED USER PROVISIONING TRIGGER (FAILSAFE)
+-- ==============================================================================
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.profiles (id, role, full_name)
+  values (
+    new.id,
+    coalesce(new.raw_user_meta_data->>'role', 'patient'),
+    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1))
+  )
+  on conflict (id) do update set
+    role = excluded.role,
+    full_name = excluded.full_name;
+
+  if (coalesce(new.raw_user_meta_data->>'role', 'patient') = 'staff') then
+    insert into public.staff (id, title, specialty)
+    values (
+      new.id,
+      coalesce(new.raw_user_meta_data->>'title', 'Physician'),
+      coalesce(new.raw_user_meta_data->>'specialty', 'General Practice')
+    )
+    on conflict (id) do nothing;
+  else
+    insert into public.patients (id)
+    values (new.id)
+    on conflict (id) do nothing;
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
+

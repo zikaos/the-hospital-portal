@@ -19,6 +19,14 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password?: string) => Promise<{ error?: string }>;
   loginStaff: (email: string, password?: string, passcode?: string) => Promise<{ error?: string }>;
+  registerStaff: (
+    email: string,
+    password?: string,
+    fullName?: string,
+    passcode?: string,
+    title?: string,
+    specialty?: string
+  ) => Promise<{ error?: string }>;
   signUp: (email: string, password?: string, fullName?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   switchDemoRole: (role: Role) => Promise<void>;
@@ -111,6 +119,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Staff Registration with Secret Security Passcode
+  const registerStaff = async (
+    email: string,
+    password?: string,
+    fullName?: string,
+    passcode?: string,
+    title?: string,
+    specialty?: string
+  ) => {
+    setLoading(true);
+    try {
+      const res = await apiSignUp(
+        email,
+        password,
+        fullName,
+        'staff',
+        passcode,
+        { title, specialty }
+      );
+      if (res.error) {
+        setLoading(false);
+        return { error: res.error };
+      }
+      setUser(res.user);
+      setLoading(false);
+      router.push('/staff/dashboard');
+      return {};
+    } catch (err: any) {
+      setLoading(false);
+      return { error: err.message || 'Staff registration failed' };
+    }
+  };
+
   // Public Registration: Patients Only
   const signUp = async (email: string, password?: string, fullName?: string) => {
     setLoading(true);
@@ -165,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         login,
         loginStaff,
+        registerStaff,
         signUp,
         logout,
         switchDemoRole,
