@@ -6,7 +6,6 @@ import { getMyPrescriptions } from '@/lib/api';
 import { Prescription } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { formatDate } from '@/lib/utils';
 import { Pill, Calendar, User, CheckCircle2 } from 'lucide-react';
 
@@ -14,6 +13,7 @@ export default function PatientPrescriptionsPage() {
   const { user } = useAuth();
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'active' | 'past'>('active');
 
   useEffect(() => {
     async function loadPrescriptions() {
@@ -117,49 +117,59 @@ export default function PatientPrescriptionsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="active">
-        <TabsList className="mb-4 bg-neutral-100 p-1 rounded-[6px]">
-          <TabsTrigger value="active" className="gap-1.5 rounded-[4px] text-xs">
-            <CheckCircle2 className="h-3.5 w-3.5 text-secondary" />
-            Active medications ({activePrescriptions.length})
-          </TabsTrigger>
-          <TabsTrigger value="past" className="gap-1.5 rounded-[4px] text-xs">
-            Past medications ({pastPrescriptions.length})
-          </TabsTrigger>
-        </TabsList>
+      <div className="inline-flex h-[38px] items-center justify-center rounded-[8px] bg-neutral-100 p-1 mb-4 text-[#6B6B6B]">
+        <button
+          type="button"
+          onClick={() => setActiveTab('active')}
+          className={`inline-flex items-center gap-1.5 rounded-[6px] px-3.5 py-1 text-xs font-medium transition-all ${
+            activeTab === 'active'
+              ? 'bg-white text-textPrimary shadow-sm font-semibold'
+              : 'text-textSecondary hover:text-textPrimary'
+          }`}
+        >
+          <CheckCircle2 className="h-3.5 w-3.5 text-secondary" />
+          Active medications ({activePrescriptions.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('past')}
+          className={`inline-flex items-center gap-1.5 rounded-[6px] px-3.5 py-1 text-xs font-medium transition-all ${
+            activeTab === 'past'
+              ? 'bg-white text-textPrimary shadow-sm font-semibold'
+              : 'text-textSecondary hover:text-textPrimary'
+          }`}
+        >
+          Past medications ({pastPrescriptions.length})
+        </button>
+      </div>
 
-        <TabsContent value="active">
-          {activePrescriptions.length === 0 ? (
-            <div className="text-center py-16 rounded-[12px] border border-dashed border-border bg-surface">
-              <Pill className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-textPrimary">No active prescriptions</p>
-              <p className="text-xs text-textSecondary mt-1">
-                You currently do not have any active medications on file.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {activePrescriptions.map((rx) => renderPrescriptionCard(rx, true))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="past">
-          {pastPrescriptions.length === 0 ? (
-            <div className="text-center py-16 rounded-[12px] border border-dashed border-border bg-surface">
-              <Pill className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-textPrimary">No past prescriptions</p>
-              <p className="text-xs text-textSecondary mt-1">
-                Completed medications and past prescriptions will appear here.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {pastPrescriptions.map((rx) => renderPrescriptionCard(rx, false))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+      {activeTab === 'active' ? (
+        activePrescriptions.length === 0 ? (
+          <div className="text-center py-16 rounded-[12px] border border-dashed border-border bg-surface">
+            <Pill className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
+            <p className="text-sm font-semibold text-textPrimary">No active prescriptions</p>
+            <p className="text-xs text-textSecondary mt-1">
+              You currently do not have any active medications on file.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {activePrescriptions.map((rx) => renderPrescriptionCard(rx, true))}
+          </div>
+        )
+      ) : pastPrescriptions.length === 0 ? (
+        <div className="text-center py-16 rounded-[12px] border border-dashed border-border bg-surface">
+          <Pill className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
+          <p className="text-sm font-semibold text-textPrimary">No past prescriptions</p>
+          <p className="text-xs text-textSecondary mt-1">
+            Completed medications and past prescriptions will appear here.
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {pastPrescriptions.map((rx) => renderPrescriptionCard(rx, false))}
+        </div>
+      )}
     </div>
   );
 }

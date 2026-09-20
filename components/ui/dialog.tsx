@@ -11,37 +11,30 @@ interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        onOpenChange(false);
-      }
-    };
-    if (open) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [open, onOpenChange]);
+  const dialogRef = React.useRef<HTMLDialogElement>(null);
 
-  if (!open) return null;
+  React.useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    if (open && !dialog.open) {
+      dialog.showModal();
+    } else if (!open && dialog.open) {
+      dialog.close();
+    }
+  }, [open]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-[#0A0A0A]/40 backdrop-blur-sm transition-opacity"
-        onClick={() => onOpenChange(false)}
-        aria-hidden="true"
-      />
-      {/* Modal Container */}
-      <div className="relative z-50 w-full max-w-lg">{children}</div>
-    </div>
+    <dialog
+      ref={dialogRef}
+      onClose={() => onOpenChange(false)}
+      onClick={(e) => {
+        if (e.target === dialogRef.current) onOpenChange(false);
+      }}
+      className="m-auto p-0 bg-transparent max-w-lg w-full backdrop:bg-[#0A0A0A]/40 backdrop:backdrop-blur-sm border-none shadow-none rounded-[12px] overflow-visible"
+    >
+      {open && children}
+    </dialog>
   );
 }
 
@@ -56,10 +49,8 @@ export function DialogContent({
 }) {
   return (
     <div
-      role="dialog"
-      aria-modal="true"
       className={cn(
-        'relative w-full rounded-[12px] border border-[#E8E8EC] bg-white p-6 shadow-xl transition-all duration-200',
+        'relative w-full rounded-[12px] border border-[#E8E8EC] bg-white p-6 shadow-xl',
         className
       )}
     >

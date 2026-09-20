@@ -50,10 +50,9 @@ export function NotificationBell() {
   };
 
   const handleMarkAllRead = async () => {
-    for (const n of notifications.filter((item) => !item.is_read)) {
-      await markNotificationRead(n.id);
-    }
+    const unread = notifications.filter((item) => !item.is_read);
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    await Promise.all(unread.map((n) => markNotificationRead(n.id)));
   };
 
   return (

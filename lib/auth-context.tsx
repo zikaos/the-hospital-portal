@@ -2,10 +2,9 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { getCurrentUser, login as apiLogin, loginStaff as apiLoginStaff, signUp as apiSignUp, logout as apiLogout, setDemoUser } from './api';
+import { getCurrentUser, login as apiLogin, loginStaff as apiLoginStaff, signUp as apiSignUp, logout as apiLogout } from './api';
 import { supabase, isSupabaseConfigured } from './supabase';
 import { Role } from './types';
-import { INITIAL_PATIENT_PROFILES, INITIAL_STAFF_PROFILES } from './mock-data';
 
 interface UserSession {
   id: string;
@@ -29,7 +28,6 @@ interface AuthContextType {
   ) => Promise<{ error?: string }>;
   signUp: (email: string, password?: string, fullName?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
-  switchDemoRole: (role: Role) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -179,26 +177,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push('/login');
   };
 
-  const switchDemoRole = async (targetRole: Role) => {
-    setLoading(true);
-    if (targetRole === 'staff') {
-      // Directs to the secure staff portal
-      router.push('/staff-portal');
-      setLoading(false);
-    } else {
-      const patientUser = {
-        id: INITIAL_PATIENT_PROFILES[0].id,
-        email: INITIAL_PATIENT_PROFILES[0].email || 'sarah.chen@example.com',
-        role: 'patient' as Role,
-        full_name: INITIAL_PATIENT_PROFILES[0].full_name,
-      };
-      await setDemoUser(patientUser);
-      setUser(patientUser);
-      setLoading(false);
-      router.push('/patient/dashboard');
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -209,7 +187,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         registerStaff,
         signUp,
         logout,
-        switchDemoRole,
       }}
     >
       {children}
