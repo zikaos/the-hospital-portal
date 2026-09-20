@@ -25,272 +25,329 @@ export interface AuthSession {
 export const CLINIC_STAFF_PASSCODE = process.env.NEXT_PUBLIC_STAFF_PASSCODE || 'APEX-STAFF-9021';
 
 // -----------------------------------------------------------------------------
-// AUTH OPERATIONS
+// PROTOTYPE CONSTANTS & IN-MEMORY STORE
 // -----------------------------------------------------------------------------
 
-async function ensureProfile(user: any): Promise<Profile | null> {
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .maybeSingle();
+const PROTOTYPE_PATIENT_USER: AuthSession['user'] = {
+  id: 'p0000000-0000-0000-0000-000000000001',
+  email: 'sarah.chen@example.com',
+  role: 'patient',
+  full_name: 'Sarah Chen',
+};
 
-  if (profile) return profile;
+const PROTOTYPE_STAFF_USER: AuthSession['user'] = {
+  id: 'd0000000-0000-0000-0000-000000000001',
+  email: 'dr.vance@clinic.demo',
+  role: 'staff',
+  full_name: 'Dr. Marcus Vance',
+};
 
-  // Auto-heal missing profile (e.g. signup when email confirmation was pending)
-  const role = (user.user_metadata?.role as Role) || 'patient';
-  const fullName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+const protoProfile: PatientProfile = {
+  id: PROTOTYPE_PATIENT_USER.id,
+  email: PROTOTYPE_PATIENT_USER.email,
+  role: 'patient',
+  full_name: 'Sarah Chen',
+  phone: '(555) 987-6543',
+  created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
+  patient_details: {
+    id: PROTOTYPE_PATIENT_USER.id,
+    date_of_birth: '1992-04-15',
+    gender: 'Female',
+    address: '742 Evergreen Terrace, Springfield, OR',
+    insurance_provider: 'Blue Cross Blue Shield',
+    insurance_number: 'BCBS-9982410-01',
+    emergency_contact_name: 'Michael Chen (Spouse)',
+    emergency_contact_phone: '(555) 987-6544',
+    created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
+  },
+};
 
-  const { data: created, error } = await supabase
-    .from('profiles')
-    .insert({
-      id: user.id,
-      role,
-      full_name: fullName,
-    })
-    .select('*')
-    .maybeSingle();
+const protoStaffList: StaffProfile[] = [
+  {
+    id: PROTOTYPE_STAFF_USER.id,
+    email: PROTOTYPE_STAFF_USER.email,
+    role: 'staff',
+    full_name: 'Dr. Marcus Vance',
+    phone: '(555) 234-5678',
+    created_at: new Date(Date.now() - 120 * 86400000).toISOString(),
+    staff_details: {
+      id: PROTOTYPE_STAFF_USER.id,
+      title: 'Attending Physician',
+      specialty: 'Cardiology & Internal Medicine',
+      created_at: new Date(Date.now() - 120 * 86400000).toISOString(),
+    },
+  },
+  {
+    id: 'd0000000-0000-0000-0000-000000000002',
+    email: 'nurse.rostova@clinic.demo',
+    role: 'staff',
+    full_name: 'Nurse Elena Rostova, RN',
+    phone: '(555) 345-6789',
+    created_at: new Date(Date.now() - 120 * 86400000).toISOString(),
+    staff_details: {
+      id: 'd0000000-0000-0000-0000-000000000002',
+      title: 'Lead Nurse Practitioner',
+      specialty: 'Clinical Triage & Family Practice',
+      created_at: new Date(Date.now() - 120 * 86400000).toISOString(),
+    },
+  },
+];
 
-  if (error || !created) return null;
+let protoAppointments: Appointment[] = [
+  {
+    id: 'apt-001',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    scheduled_at: new Date(Date.now() + 86400000 * 2).toISOString(),
+    reason: 'Cardiology consultation and blood pressure follow-up',
+    status: 'confirmed',
+    notes: 'Please bring medication history and past lab panel.',
+    created_at: new Date().toISOString(),
+    patient: {
+      full_name: 'Sarah Chen',
+      phone: '(555) 987-6543',
+      email: 'sarah.chen@example.com',
+      date_of_birth: '1992-04-15',
+      gender: 'Female',
+      insurance_provider: 'Blue Cross Blue Shield',
+    },
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+      specialty: 'Cardiology & Internal Medicine',
+    },
+  },
+  {
+    id: 'apt-002',
+    patient_id: 'p0000000-0000-0000-0000-000000000002',
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    scheduled_at: new Date(Date.now() + 86400000 * 4).toISOString(),
+    reason: 'Annual routine health evaluation',
+    status: 'pending',
+    notes: 'Fasting lipid profile required prior to visit.',
+    created_at: new Date().toISOString(),
+    patient: {
+      full_name: 'David Miller',
+      phone: '(555) 876-5432',
+      email: 'david.miller@example.com',
+      date_of_birth: '1985-08-22',
+      gender: 'Male',
+      insurance_provider: 'Aetna Health',
+    },
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+      specialty: 'Cardiology & Internal Medicine',
+    },
+  },
+  {
+    id: 'apt-003',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    scheduled_at: new Date(Date.now() - 86400000 * 28).toISOString(),
+    reason: 'Comprehensive wellness screening and routine review',
+    status: 'completed',
+    notes: 'Vital signs normal. Patient advised to maintain current cardio regimen.',
+    created_at: new Date(Date.now() - 86400000 * 30).toISOString(),
+    patient: {
+      full_name: 'Sarah Chen',
+      phone: '(555) 987-6543',
+    },
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+      specialty: 'Cardiology & Internal Medicine',
+    },
+  },
+];
 
-  if (role === 'patient') {
-    await supabase.from('patients').upsert({ id: user.id });
-  } else if (role === 'staff') {
-    await supabase.from('staff').upsert({
-      id: user.id,
-      title: user.user_metadata?.title || 'Staff Physician',
-      specialty: user.user_metadata?.specialty || 'General Medicine',
-    });
+let protoRecords: MedicalRecord[] = [
+  {
+    id: 'rec-001',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    record_type: 'lab_result',
+    title: 'Comprehensive Metabolic Panel (CMP)',
+    description: 'Electrolyte balance, kidney parameters, and hepatic function within normal clinical limits.',
+    record_date: new Date(Date.now() - 86400000 * 5).toISOString().split('T')[0],
+    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+    },
+  },
+  {
+    id: 'rec-002',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    record_type: 'diagnosis',
+    title: 'Resting 12-Lead Electrocardiogram',
+    description: 'Normal sinus rhythm at 68 bpm. No acute ST-T segment elevation or ischemic changes observed.',
+    record_date: new Date(Date.now() - 86400000 * 28).toISOString().split('T')[0],
+    created_at: new Date(Date.now() - 86400000 * 28).toISOString(),
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+    },
+  },
+  {
+    id: 'rec-003',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    record_type: 'visit_summary',
+    title: 'Annual Cardiovascular Evaluation',
+    description: 'Patient demonstrates excellent blood pressure stability. Continued current pharmacological plan.',
+    record_date: new Date(Date.now() - 86400000 * 28).toISOString().split('T')[0],
+    created_at: new Date(Date.now() - 86400000 * 28).toISOString(),
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+    },
+  },
+];
+
+let protoPrescriptions: Prescription[] = [
+  {
+    id: 'rx-001',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    medication_name: 'Lisinopril',
+    dosage: '10 mg',
+    frequency: 'Once daily in the morning',
+    start_date: new Date(Date.now() - 86400000 * 90).toISOString().split('T')[0],
+    end_date: new Date(Date.now() + 86400000 * 90).toISOString().split('T')[0],
+    status: 'active',
+    notes: 'Take with or without food. Monitor blood pressure periodically.',
+    created_at: new Date(Date.now() - 86400000 * 90).toISOString(),
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+    },
+  },
+  {
+    id: 'rx-002',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    medication_name: 'Atorvastatin',
+    dosage: '20 mg',
+    frequency: 'Once daily at bedtime',
+    start_date: new Date(Date.now() - 86400000 * 60).toISOString().split('T')[0],
+    end_date: new Date(Date.now() + 86400000 * 120).toISOString().split('T')[0],
+    status: 'active',
+    notes: 'Primary cardiovascular lipid maintenance.',
+    created_at: new Date(Date.now() - 86400000 * 60).toISOString(),
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+    },
+  },
+  {
+    id: 'rx-003',
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    medication_name: 'Amoxicillin',
+    dosage: '500 mg',
+    frequency: 'Three times daily for 10 days',
+    start_date: new Date(Date.now() - 86400000 * 120).toISOString().split('T')[0],
+    end_date: new Date(Date.now() - 86400000 * 110).toISOString().split('T')[0],
+    status: 'completed',
+    notes: 'Completed standard antibiotic course.',
+    created_at: new Date(Date.now() - 86400000 * 120).toISOString(),
+    staff: {
+      full_name: 'Dr. Marcus Vance',
+      title: 'Attending Physician',
+    },
+  },
+];
+
+let protoNotifications: Notification[] = [
+  {
+    id: 'notif-001',
+    user_id: PROTOTYPE_PATIENT_USER.id,
+    message: 'Dr. Marcus Vance confirmed your cardiology consultation for Thursday at 10:00 AM.',
+    is_read: false,
+    created_at: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
+  },
+  {
+    id: 'notif-002',
+    user_id: PROTOTYPE_PATIENT_USER.id,
+    message: 'Your Comprehensive Metabolic Panel (CMP) diagnostic results are now available to review.',
+    is_read: true,
+    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+  },
+];
+
+// -----------------------------------------------------------------------------
+// AUTH OPERATIONS (FRICTIONLESS PROTOTYPE)
+// -----------------------------------------------------------------------------
+
+export async function getCurrentUser(): Promise<AuthSession['user']> {
+  if (typeof window !== 'undefined' && window.location.pathname.startsWith('/staff')) {
+    return PROTOTYPE_STAFF_USER;
   }
-
-  return created;
-}
-
-export async function getCurrentUser(): Promise<AuthSession['user'] | null> {
-  if (!isSupabaseConfigured()) return null;
-
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) return null;
-
-  const profile = await ensureProfile(user);
-  if (!profile) return null;
-
-  return {
-    id: user.id,
-    email: user.email || '',
-    role: profile.role as Role,
-    full_name: profile.full_name,
-  };
+  return PROTOTYPE_PATIENT_USER;
 }
 
 export async function login(
-  email: string,
+  email?: string,
   password?: string,
   options?: { requireRole?: Role; passcode?: string }
-): Promise<{ user: AuthSession['user']; error?: string }> {
-  if (!isSupabaseConfigured()) {
-    return { user: null as any, error: 'Database is not configured.' };
-  }
-
-  const requireRole = options?.requireRole;
-  const passcode = options?.passcode;
-
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password: password || '',
-  });
-
-  if (error) {
-    if (error.message.toLowerCase().includes('email not confirmed')) {
-      return {
-        user: null as any,
-        error: 'Email address has not been confirmed. Please check your verification link or confirm the user in Supabase.',
-      };
-    }
-    return { user: null as any, error: error.message };
-  }
-
-  const profile = await ensureProfile(data.user);
-  if (!profile) {
-    return { user: null as any, error: 'User profile not found in system.' };
-  }
-
-  const userRole = profile.role as Role;
-
-  // Reject staff login on public patient portal
-  if (requireRole === 'patient' && userRole === 'staff') {
-    await supabase.auth.signOut();
-    return {
-      user: null as any,
-      error: 'Staff accounts cannot sign in through the public patient portal. Please use the private internal staff entrance.',
-    };
-  }
-
-  // Require valid clinic passcode for staff login
-  if (requireRole === 'staff' || userRole === 'staff') {
-    if (passcode !== CLINIC_STAFF_PASSCODE) {
-      await supabase.auth.signOut();
-      return {
-        user: null as any,
-        error: 'Invalid Clinic Security Passcode. Access to the staff portal is restricted to authorized personnel.',
-      };
-    }
-    if (userRole !== 'staff') {
-      await supabase.auth.signOut();
-      return {
-        user: null as any,
-        error: 'This account does not have clinical staff privileges.',
-      };
-    }
-  }
-
-  return {
-    user: {
-      id: data.user.id,
-      email: data.user.email || email,
-      role: userRole,
-      full_name: profile.full_name,
-    },
-  };
+): Promise<{ user: AuthSession['user'] }> {
+  const isStaff = options?.requireRole === 'staff';
+  return { user: isStaff ? PROTOTYPE_STAFF_USER : PROTOTYPE_PATIENT_USER };
 }
 
 export async function loginStaff(
-  email: string,
+  email?: string,
   password?: string,
   passcode?: string
-): Promise<{ user: AuthSession['user']; error?: string }> {
-  return login(email, password, { requireRole: 'staff', passcode });
+): Promise<{ user: AuthSession['user'] }> {
+  return { user: PROTOTYPE_STAFF_USER };
 }
 
 export async function signUp(
-  email: string,
+  email?: string,
   password?: string,
   fullName?: string,
   role: Role = 'patient',
   staffPasscode?: string,
   staffDetails?: { title?: string; specialty?: string }
-): Promise<{ user: AuthSession['user']; error?: string }> {
-  const name = fullName || email.split('@')[0];
-
-  // Disallow staff registration unless valid administrative clinic passcode is provided
-  if (role === 'staff' && staffPasscode !== CLINIC_STAFF_PASSCODE) {
-    return {
-      user: null as any,
-      error: 'Unauthorized. Staff accounts can only be provisioned with a valid Clinic Passcode.',
-    };
+): Promise<{ user: AuthSession['user'] }> {
+  const targetUser = role === 'staff' ? PROTOTYPE_STAFF_USER : PROTOTYPE_PATIENT_USER;
+  if (fullName) {
+    targetUser.full_name = fullName;
   }
-
-  if (!isSupabaseConfigured()) {
-    return { user: null as any, error: 'Database is not configured.' };
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password: password || 'Password123!',
-    options: {
-      data: {
-        full_name: name,
-        role,
-        title: staffDetails?.title || 'Staff Physician',
-        specialty: staffDetails?.specialty || 'General Medicine',
-      },
-    },
-  });
-
-  if (error) return { user: null as any, error: error.message };
-  if (!data.user) return { user: null as any, error: 'Registration failed.' };
-
-  // Insert profile and role records
-  await supabase.from('profiles').upsert({
-    id: data.user.id,
-    role,
-    full_name: name,
-  });
-
-  if (role === 'patient') {
-    await supabase.from('patients').upsert({ id: data.user.id });
-  } else if (role === 'staff') {
-    await supabase.from('staff').upsert({
-      id: data.user.id,
-      title: staffDetails?.title || 'Staff Physician',
-      specialty: staffDetails?.specialty || 'General Medicine',
-    });
-  }
-
-  return {
-    user: {
-      id: data.user.id,
-      email: data.user.email || email,
-      role,
-      full_name: name,
-    },
-  };
+  return { user: targetUser };
 }
 
 export async function logout(): Promise<void> {
-  if (isSupabaseConfigured()) {
-    await supabase.auth.signOut();
-  }
+  // Prototype mode: no-op
 }
 
 // -----------------------------------------------------------------------------
 // PATIENT OPERATIONS
 // -----------------------------------------------------------------------------
 
-export async function getMyProfile(): Promise<PatientProfile | null> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return null;
-
-  const { data: profile, error: profileErr } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  if (profileErr || !profile) return null;
-
-  const { data: patient } = await supabase
-    .from('patients')
-    .select('*')
-    .eq('id', user.id)
-    .single();
-
-  return {
-    ...profile,
-    patient_details: patient || null,
-  };
+export async function getMyProfile(): Promise<PatientProfile> {
+  if (isSupabaseConfigured()) {
+    try {
+      const { data } = await supabase.from('profiles').select('*, patient_details:patients(*)').maybeSingle();
+      if (data) return data;
+    } catch {
+      // Fall through to prototype profile
+    }
+  }
+  return protoProfile;
 }
 
 export async function updateMyProfile(
   fields: Partial<Patient> & { full_name?: string; phone?: string }
 ): Promise<{ success: boolean; error?: string }> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return { success: false, error: 'Not authenticated' };
-
-  if (fields.full_name || fields.phone !== undefined) {
-    await supabase
-      .from('profiles')
-      .update({
-        full_name: fields.full_name,
-        phone: fields.phone,
-      })
-      .eq('id', user.id);
+  if (fields.full_name) protoProfile.full_name = fields.full_name;
+  if (fields.phone) protoProfile.phone = fields.phone;
+  if (protoProfile.patient_details) {
+    Object.assign(protoProfile.patient_details, fields);
   }
-
-  const { error } = await supabase
-    .from('patients')
-    .upsert({
-      id: user.id,
-      date_of_birth: fields.date_of_birth,
-      gender: fields.gender,
-      address: fields.address,
-      insurance_provider: fields.insurance_provider,
-      insurance_number: fields.insurance_number,
-      emergency_contact_name: fields.emergency_contact_name,
-      emergency_contact_phone: fields.emergency_contact_phone,
-    });
-
-  if (error) return { success: false, error: error.message };
   return { success: true };
 }
 
@@ -299,31 +356,31 @@ export async function updateMyProfile(
 // -----------------------------------------------------------------------------
 
 export async function getMyAppointments(): Promise<Appointment[]> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return [];
+  if (isSupabaseConfigured()) {
+    try {
+      const { data } = await supabase
+        .from('appointments')
+        .select('*, staff:staff_id(profiles(full_name), title, specialty)')
+        .order('scheduled_at', { ascending: false });
 
-  const { data, error } = await supabase
-    .from('appointments')
-    .select(`
-      *,
-      staff:staff_id(
-        profiles(full_name),
-        title,
-        specialty
-      )
-    `)
-    .eq('patient_id', user.id)
-    .order('scheduled_at', { ascending: false });
+      if (data && data.length > 0) {
+        return data.map((item: any) => ({
+          ...item,
+          staff: item.staff
+            ? {
+                full_name: item.staff.profiles?.full_name || 'Clinic Physician',
+                title: item.staff.title,
+                specialty: item.staff.specialty,
+              }
+            : undefined,
+        }));
+      }
+    } catch {
+      // Fall through
+    }
+  }
 
-  if (error || !data) return [];
-  return data.map((item: any) => ({
-    ...item,
-    staff: item.staff ? {
-      full_name: item.staff.profiles?.full_name || 'Clinic Physician',
-      title: item.staff.title,
-      specialty: item.staff.specialty,
-    } : undefined,
-  }));
+  return protoAppointments.filter((a) => a.patient_id === PROTOTYPE_PATIENT_USER.id);
 }
 
 export async function createAppointment(
@@ -331,47 +388,45 @@ export async function createAppointment(
   reason: string,
   staffId?: string
 ): Promise<{ success: boolean; appointment?: Appointment; error?: string }> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return { success: false, error: 'Not authenticated' };
+  const staff = protoStaffList.find((s) => s.id === staffId) || protoStaffList[0];
 
-  const { data, error } = await supabase
-    .from('appointments')
-    .insert({
-      patient_id: user.id,
-      staff_id: staffId || null,
-      scheduled_at: scheduledAt,
-      reason,
-      status: 'pending',
-    })
-    .select()
-    .single();
+  const newApt: Appointment = {
+    id: `apt-${Date.now()}`,
+    patient_id: PROTOTYPE_PATIENT_USER.id,
+    staff_id: staff.id,
+    scheduled_at: scheduledAt,
+    reason,
+    status: 'pending',
+    created_at: new Date().toISOString(),
+    patient: {
+      full_name: protoProfile.full_name,
+      phone: protoProfile.phone,
+      email: protoProfile.email,
+    },
+    staff: {
+      full_name: staff.full_name,
+      title: staff.staff_details?.title,
+      specialty: staff.staff_details?.specialty,
+    },
+  };
 
-  if (error) return { success: false, error: error.message };
+  protoAppointments.unshift(newApt);
 
-  await supabase.from('notifications').insert({
-    user_id: user.id,
-    message: `Your appointment request for ${new Date(scheduledAt).toLocaleString()} has been received and is pending confirmation.`,
+  protoNotifications.unshift({
+    id: `notif-${Date.now()}`,
+    user_id: PROTOTYPE_PATIENT_USER.id,
+    message: `Appointment request submitted for ${new Date(scheduledAt).toLocaleString()}.`,
+    is_read: false,
+    created_at: new Date().toISOString(),
   });
 
-  return { success: true, appointment: data };
+  return { success: true, appointment: newApt };
 }
 
 export async function cancelAppointment(id: string): Promise<{ success: boolean; error?: string }> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return { success: false, error: 'Not authenticated' };
-
-  const { error } = await supabase
-    .from('appointments')
-    .update({ status: 'cancelled' })
-    .eq('id', id);
-
-  if (error) return { success: false, error: error.message };
-
-  await supabase.from('notifications').insert({
-    user_id: user.id,
-    message: 'Your appointment has been cancelled.',
-  });
-
+  protoAppointments = protoAppointments.map((a) =>
+    a.id === id ? { ...a, status: 'cancelled' as AppointmentStatus } : a
+  );
   return { success: true };
 }
 
@@ -380,29 +435,19 @@ export async function cancelAppointment(id: string): Promise<{ success: boolean;
 // -----------------------------------------------------------------------------
 
 export async function getMyRecords(): Promise<MedicalRecord[]> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return [];
+  if (isSupabaseConfigured()) {
+    try {
+      const { data } = await supabase
+        .from('medical_records')
+        .select('*, staff:staff_id(profiles(full_name), title)')
+        .order('record_date', { ascending: false });
 
-  const { data, error } = await supabase
-    .from('medical_records')
-    .select(`
-      *,
-      staff:staff_id(
-        profiles(full_name),
-        title
-      )
-    `)
-    .eq('patient_id', user.id)
-    .order('record_date', { ascending: false });
-
-  if (error || !data) return [];
-  return data.map((item: any) => ({
-    ...item,
-    staff: item.staff ? {
-      full_name: item.staff.profiles?.full_name || 'Staff Provider',
-      title: item.staff.title,
-    } : undefined,
-  }));
+      if (data && data.length > 0) return data;
+    } catch {
+      // Fall through
+    }
+  }
+  return protoRecords;
 }
 
 // -----------------------------------------------------------------------------
@@ -410,29 +455,15 @@ export async function getMyRecords(): Promise<MedicalRecord[]> {
 // -----------------------------------------------------------------------------
 
 export async function getMyPrescriptions(): Promise<Prescription[]> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return [];
-
-  const { data, error } = await supabase
-    .from('prescriptions')
-    .select(`
-      *,
-      staff:staff_id(
-        profiles(full_name),
-        title
-      )
-    `)
-    .eq('patient_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error || !data) return [];
-  return data.map((item: any) => ({
-    ...item,
-    staff: item.staff ? {
-      full_name: item.staff.profiles?.full_name || 'Prescribing Physician',
-      title: item.staff.title,
-    } : undefined,
-  }));
+  if (isSupabaseConfigured()) {
+    try {
+      const { data } = await supabase.from('prescriptions').select('*').order('created_at', { ascending: false });
+      if (data && data.length > 0) return data;
+    } catch {
+      // Fall through
+    }
+  }
+  return protoPrescriptions;
 }
 
 // -----------------------------------------------------------------------------
@@ -440,27 +471,21 @@ export async function getMyPrescriptions(): Promise<Prescription[]> {
 // -----------------------------------------------------------------------------
 
 export async function getMyNotifications(): Promise<Notification[]> {
-  const user = await getCurrentUser();
-  if (!user || !isSupabaseConfigured()) return [];
-
-  const { data, error } = await supabase
-    .from('notifications')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-
-  if (error || !data) return [];
-  return data;
+  return protoNotifications;
 }
 
 export async function markNotificationRead(id: string): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  await supabase.from('notifications').update({ is_read: true }).eq('id', id);
+  protoNotifications = protoNotifications.map((n) => (n.id === id ? { ...n, is_read: true } : n));
 }
 
 export async function createNotification(userId: string, message: string): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-  await supabase.from('notifications').insert({ user_id: userId, message });
+  protoNotifications.unshift({
+    id: `notif-${Date.now()}`,
+    user_id: userId,
+    message,
+    is_read: false,
+    created_at: new Date().toISOString(),
+  });
 }
 
 // -----------------------------------------------------------------------------
@@ -468,95 +493,64 @@ export async function createNotification(userId: string, message: string): Promi
 // -----------------------------------------------------------------------------
 
 export async function getStaffQueue(filterDate?: 'today' | 'all'): Promise<Appointment[]> {
-  if (!isSupabaseConfigured()) return [];
+  if (isSupabaseConfigured()) {
+    try {
+      const { data } = await supabase
+        .from('appointments')
+        .select('*, patient:patient_id(profiles(full_name, phone)), staff:staff_id(profiles(full_name), title)')
+        .order('scheduled_at', { ascending: true });
 
-  let query = supabase
-    .from('appointments')
-    .select(`
-      *,
-      patient:patient_id(
-        profiles(full_name, phone)
-      ),
-      staff:staff_id(
-        profiles(full_name),
-        title
-      )
-    `)
-    .order('scheduled_at', { ascending: true });
-
-  if (filterDate === 'today') {
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-
-    query = query
-      .gte('scheduled_at', startOfDay.toISOString())
-      .lte('scheduled_at', endOfDay.toISOString());
+      if (data && data.length > 0) return data;
+    } catch {
+      // Fall through
+    }
   }
-
-  const { data, error } = await query;
-  if (error || !data) return [];
-
-  return data.map((item: any) => ({
-    ...item,
-    patient: {
-      full_name: item.patient?.profiles?.full_name || 'Patient',
-      phone: item.patient?.profiles?.phone,
-    },
-    staff: item.staff ? {
-      full_name: item.staff.profiles?.full_name || 'Staff Clinician',
-      title: item.staff.title,
-    } : undefined,
-  }));
+  return protoAppointments;
 }
 
 export async function updateAppointmentStatus(
   id: string,
   status: AppointmentStatus
 ): Promise<{ success: boolean; error?: string }> {
-  if (!isSupabaseConfigured()) return { success: false, error: 'Database not configured' };
-
-  const { data, error } = await supabase
-    .from('appointments')
-    .update({ status })
-    .eq('id', id)
-    .select()
-    .single();
-
-  if (error) return { success: false, error: error.message };
-
-  if (data?.patient_id) {
-    const readableStatus = status.charAt(0).toUpperCase() + status.slice(1);
-    const formattedDate = new Date(data.scheduled_at).toLocaleDateString();
-    await createNotification(
-      data.patient_id,
-      `Your appointment on ${formattedDate} status was updated to: ${readableStatus}.`
-    );
-  }
-
+  protoAppointments = protoAppointments.map((a) => (a.id === id ? { ...a, status } : a));
   return { success: true };
 }
 
 export async function searchPatients(query: string = ''): Promise<(Profile & { patient_details?: Patient })[]> {
-  if (!isSupabaseConfigured()) return [];
-
   const q = query.toLowerCase().trim();
-  let req = supabase
-    .from('profiles')
-    .select(`
-      *,
-      patient_details:patients(*)
-    `)
-    .eq('role', 'patient');
+  const list = [
+    {
+      id: protoProfile.id,
+      role: 'patient' as Role,
+      full_name: protoProfile.full_name,
+      email: protoProfile.email,
+      phone: protoProfile.phone,
+      created_at: protoProfile.created_at,
+      patient_details: protoProfile.patient_details || undefined,
+    },
+    {
+      id: 'p0000000-0000-0000-0000-000000000002',
+      role: 'patient' as Role,
+      full_name: 'David Miller',
+      email: 'david.miller@example.com',
+      phone: '(555) 876-5432',
+      created_at: new Date(Date.now() - 45 * 86400000).toISOString(),
+      patient_details: {
+        id: 'p0000000-0000-0000-0000-000000000002',
+        date_of_birth: '1985-08-22',
+        gender: 'Male',
+        address: '1042 Elm Street, Seattle, WA',
+        insurance_provider: 'Aetna Health',
+        insurance_number: 'AET-8874102',
+        emergency_contact_name: 'Linda Miller',
+        emergency_contact_phone: '(555) 876-5433',
+        created_at: new Date(Date.now() - 45 * 86400000).toISOString(),
+      },
+    },
+  ];
 
-  if (q) {
-    req = req.ilike('full_name', `%${q}%`);
-  }
-
-  const { data, error } = await req;
-  if (error || !data) return [];
-  return data;
+  if (!q) return list;
+  return list.filter((p) => p.full_name.toLowerCase().includes(q) || (p.phone && p.phone.includes(q)));
 }
 
 export async function getPatientDetail(patientId: string): Promise<{
@@ -565,47 +559,13 @@ export async function getPatientDetail(patientId: string): Promise<{
   appointments: Appointment[];
   records: MedicalRecord[];
   prescriptions: Prescription[];
-} | null> {
-  if (!isSupabaseConfigured()) return null;
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', patientId)
-    .single();
-
-  if (!profile) return null;
-
-  const { data: patient } = await supabase
-    .from('patients')
-    .select('*')
-    .eq('id', patientId)
-    .single();
-
-  const { data: appointments } = await supabase
-    .from('appointments')
-    .select('*')
-    .eq('patient_id', patientId)
-    .order('scheduled_at', { ascending: false });
-
-  const { data: records } = await supabase
-    .from('medical_records')
-    .select('*')
-    .eq('patient_id', patientId)
-    .order('record_date', { ascending: false });
-
-  const { data: prescriptions } = await supabase
-    .from('prescriptions')
-    .select('*')
-    .eq('patient_id', patientId)
-    .order('created_at', { ascending: false });
-
+}> {
   return {
-    profile,
-    patient: patient || null,
-    appointments: appointments || [],
-    records: records || [],
-    prescriptions: prescriptions || [],
+    profile: protoProfile,
+    patient: protoProfile.patient_details || null,
+    appointments: protoAppointments.filter((a) => a.patient_id === patientId),
+    records: protoRecords.filter((r) => r.patient_id === patientId),
+    prescriptions: protoPrescriptions.filter((p) => p.patient_id === patientId),
   };
 }
 
@@ -616,45 +576,24 @@ export async function addRecord(
   description?: string,
   file?: File | null
 ): Promise<{ success: boolean; record?: MedicalRecord; error?: string }> {
-  if (!isSupabaseConfigured()) return { success: false, error: 'Database not configured' };
+  const newRec: MedicalRecord = {
+    id: `rec-${Date.now()}`,
+    patient_id: patientId,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    record_type: recordType,
+    title,
+    description: description || 'Clinical notes documented by attending staff.',
+    file_path: file ? file.name : null,
+    record_date: new Date().toISOString().split('T')[0],
+    created_at: new Date().toISOString(),
+    staff: {
+      full_name: PROTOTYPE_STAFF_USER.full_name,
+      title: 'Attending Physician',
+    },
+  };
 
-  const staffUser = await getCurrentUser();
-  let filePath: string | null = null;
-
-  if (file) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${patientId}/${Date.now()}.${fileExt}`;
-    const { data: uploadData, error: uploadErr } = await supabase.storage
-      .from('medical-files')
-      .upload(fileName, file);
-
-    if (!uploadErr && uploadData) {
-      filePath = uploadData.path;
-    }
-  }
-
-  const { data, error } = await supabase
-    .from('medical_records')
-    .insert({
-      patient_id: patientId,
-      staff_id: staffUser?.id || null,
-      record_type: recordType,
-      title,
-      description,
-      file_path: filePath,
-      record_date: new Date().toISOString().split('T')[0],
-    })
-    .select()
-    .single();
-
-  if (error) return { success: false, error: error.message };
-
-  await createNotification(
-    patientId,
-    `A new medical record was added to your chart: ${title}`
-  );
-
-  return { success: true, record: data };
+  protoRecords.unshift(newRec);
+  return { success: true, record: newRec };
 }
 
 export async function addPrescription(
@@ -668,54 +607,28 @@ export async function addPrescription(
     notes?: string;
   }
 ): Promise<{ success: boolean; prescription?: Prescription; error?: string }> {
-  if (!isSupabaseConfigured()) return { success: false, error: 'Database not configured' };
+  const newRx: Prescription = {
+    id: `rx-${Date.now()}`,
+    patient_id: patientId,
+    staff_id: PROTOTYPE_STAFF_USER.id,
+    medication_name: fields.medication_name,
+    dosage: fields.dosage || 'As directed',
+    frequency: fields.frequency || 'Daily',
+    start_date: fields.start_date || new Date().toISOString().split('T')[0],
+    end_date: fields.end_date,
+    notes: fields.notes,
+    status: 'active',
+    created_at: new Date().toISOString(),
+    staff: {
+      full_name: PROTOTYPE_STAFF_USER.full_name,
+      title: 'Attending Physician',
+    },
+  };
 
-  const staffUser = await getCurrentUser();
-
-  const { data, error } = await supabase
-    .from('prescriptions')
-    .insert({
-      patient_id: patientId,
-      staff_id: staffUser?.id || null,
-      medication_name: fields.medication_name,
-      dosage: fields.dosage,
-      frequency: fields.frequency,
-      start_date: fields.start_date || new Date().toISOString().split('T')[0],
-      end_date: fields.end_date,
-      notes: fields.notes,
-      status: 'active',
-    })
-    .select()
-    .single();
-
-  if (error) return { success: false, error: error.message };
-
-  await createNotification(
-    patientId,
-    `A new prescription for ${fields.medication_name} was issued to your chart.`
-  );
-
-  return { success: true, prescription: data };
+  protoPrescriptions.unshift(newRx);
+  return { success: true, prescription: newRx };
 }
 
 export async function getStaffList(): Promise<StaffProfile[]> {
-  if (!isSupabaseConfigured()) return [];
-
-  const { data } = await supabase
-    .from('staff')
-    .select(`
-      *,
-      profiles(*)
-    `);
-
-  if (!data) return [];
-  return data.map((s: any) => ({
-    ...s.profiles,
-    staff_details: {
-      id: s.id,
-      title: s.title,
-      specialty: s.specialty,
-      created_at: s.created_at,
-    },
-  }));
+  return protoStaffList;
 }

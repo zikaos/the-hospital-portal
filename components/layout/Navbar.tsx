@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { Button } from '@/components/ui/button';
-import { Activity, LogOut, Menu } from 'lucide-react';
+import { Activity, ArrowRightLeft, Menu, Home } from 'lucide-react';
 
 interface NavbarProps {
   onToggleSidebar?: () => void;
 }
 
 export function Navbar({ onToggleSidebar }: NavbarProps) {
-  const { user, logout } = useAuth();
+  const { user, switchRole } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-[#E8E8EC] bg-white/95 backdrop-blur">
@@ -29,7 +29,7 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
             </button>
           )}
           <Link
-            href={user?.role === 'staff' ? '/staff/dashboard' : '/patient/dashboard'}
+            href={user.role === 'staff' ? '/staff/dashboard' : '/patient/dashboard'}
             className="flex items-center gap-2.5"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-[6px] bg-[#0671B8] text-white">
@@ -39,34 +39,46 @@ export function Navbar({ onToggleSidebar }: NavbarProps) {
               The Hospital Portal
             </span>
           </Link>
+          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-semibold tracking-wide uppercase bg-[#0671B8]/10 text-[#0671B8] border border-[#0671B8]/20">
+            Prototype
+          </span>
         </div>
 
-        <div className="flex items-center gap-3">
-          {user && (
-            <>
-              <NotificationBell />
+        <div className="flex items-center gap-2 sm:gap-3">
+          <NotificationBell />
 
-              <div className="hidden sm:flex flex-col text-right">
-                <span className="text-[13px] font-semibold text-[#0A0A0A] leading-tight">
-                  {user.full_name}
-                </span>
-                <span className="text-[11px] text-[#6B6B6B] capitalize">
-                  {user.role}
-                </span>
-              </div>
+          <div className="hidden md:flex flex-col text-right">
+            <span className="text-[13px] font-semibold text-[#0A0A0A] leading-tight">
+              {user.full_name}
+            </span>
+            <span className="text-[11px] text-[#6B6B6B] capitalize font-medium">
+              {user.role} view
+            </span>
+          </div>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={logout}
-                className="text-[#6B6B6B] hover:text-[#F37521] gap-1.5 text-xs h-8 px-2.5"
-                title="Sign out"
-              >
-                <LogOut className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Sign out</span>
-              </Button>
-            </>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => switchRole(user.role === 'staff' ? 'patient' : 'staff')}
+            className="gap-1.5 text-xs h-8 px-2.5 border-[#0671B8]/30 text-[#0671B8] hover:bg-[#0671B8]/5 font-medium"
+            title={`Switch to ${user.role === 'staff' ? 'Patient' : 'Staff'} Portal`}
+          >
+            <ArrowRightLeft className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">
+              Switch to {user.role === 'staff' ? 'Patient' : 'Staff'} View
+            </span>
+          </Button>
+
+          <Link href="/">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-[#6B6B6B] hover:text-[#0A0A0A] h-8 px-2"
+              title="Return to Home"
+            >
+              <Home className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </header>

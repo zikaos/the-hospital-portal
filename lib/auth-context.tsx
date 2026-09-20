@@ -2,191 +2,124 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { getCurrentUser, login as apiLogin, loginStaff as apiLoginStaff, signUp as apiSignUp, logout as apiLogout } from './api';
-import { supabase, isSupabaseConfigured } from './supabase';
 import { Role } from './types';
 
-interface UserSession {
+export interface UserSession {
   id: string;
   email: string;
   role: Role;
   full_name: string;
 }
 
+export const PROTOTYPE_PATIENT: UserSession = {
+  id: 'p0000000-0000-0000-0000-000000000001',
+  email: 'sarah.chen@example.com',
+  role: 'patient',
+  full_name: 'Sarah Chen',
+};
+
+export const PROTOTYPE_STAFF: UserSession = {
+  id: 'd0000000-0000-0000-0000-000000000001',
+  email: 'dr.vance@clinic.demo',
+  role: 'staff',
+  full_name: 'Dr. Marcus Vance',
+};
+
 interface AuthContextType {
-  user: UserSession | null;
+  user: UserSession;
   loading: boolean;
-  login: (email: string, password?: string) => Promise<{ error?: string }>;
-  loginStaff: (email: string, password?: string, passcode?: string) => Promise<{ error?: string }>;
+  login: (email?: string, password?: string) => Promise<{ error?: string }>;
+  loginStaff: (email?: string, password?: string, passcode?: string) => Promise<{ error?: string }>;
   registerStaff: (
-    email: string,
+    email?: string,
     password?: string,
     fullName?: string,
     passcode?: string,
     title?: string,
     specialty?: string
   ) => Promise<{ error?: string }>;
-  signUp: (email: string, password?: string, fullName?: string) => Promise<{ error?: string }>;
+  signUp: (email?: string, password?: string, fullName?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
+  switchRole: (role: Role) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserSession | null>(null);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
+  const isStaffPath = pathname?.startsWith('/staff');
+  const [activeRole, setActiveRole] = useState<Role>(isStaffPath ? 'staff' : 'patient');
+
   useEffect(() => {
-    function handleTokenRedirect(u: UserSession | null) {
-      if (typeof window !== 'undefined' && window.location.hash.includes('access_token')) {
-        window.history.replaceState(null, '', window.location.pathname);
-        if (u) {
-          router.push(u.role === 'staff' ? '/staff/dashboard' : '/patient/dashboard');
-        }
-      }
+    if (pathname?.startsWith('/staff')) {
+      setActiveRole('staff');
+    } else if (pathname?.startsWith('/patient')) {
+      setActiveRole('patient');
     }
+  }, [pathname]);
 
-    async function loadUser() {
-      try {
-        const u = await getCurrentUser();
-        setUser(u);
-        handleTokenRedirect(u);
-      } catch (err) {
-        console.error('Error loading session:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
+  const user = activeRole === 'staff' ? PROTOTYPE_STAFF : PROTOTYPE_PATIENT;
 
-    loadUser();
-
-    if (isSupabaseConfigured()) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
-          const u = await getCurrentUser();
-          setUser(u);
-          handleTokenRedirect(u);
-        } else if (event === 'SIGNED_OUT') {
-          setUser(null);
-        }
-      });
-
-      return () => {
-        subscription.unsubscribe();
-      };
-    }
-  }, [router]);
-
-  // Patient Login (Rejects Staff)
-  const login = async (email: string, password?: string) => {
-    setLoading(true);
-    try {
-      const res = await apiLogin(email, password, { requireRole: 'patient' });
-      if (res.error) {
-        setLoading(false);
-        return { error: res.error };
-      }
-      setUser(res.user);
-      setLoading(false);
-      router.push('/patient/dashboard');
-      return {};
-    } catch (err: any) {
-      setLoading(false);
-      return { error: err.message || 'Login failed' };
-    }
-  };
-
-  // Dedicated Staff Login with Passcode
-  const loginStaff = async (email: string, password?: string, passcode?: string) => {
-    setLoading(true);
-    try {
-      const res = await apiLoginStaff(email, password, passcode);
-      if (res.error) {
-        setLoading(false);
-        return { error: res.error };
-      }
-      setUser(res.user);
-      setLoading(false);
+  const switchRole = (role: Role) => {
+    setActiveRole(role);
+    if (role === 'staff') {
       router.push('/staff/dashboard');
-      return {};
-    } catch (err: any) {
-      setLoading(false);
-      return { error: err.message || 'Staff login failed' };
+    } else {
+      router.push('/patient/dashboard');
     }
   };
 
-  // Staff Registration with Secret Security Passcode
+  const login = async () => {
+    switchRole('patient');
+    return {};
+  };
+
+  const loginStaff = async () => {
+    switchRole('staff');
+    return {};
+  };
+
   const registerStaff = async (
-    email: string,
+    email?: string,
     password?: string,
-    fullName?: string,
-    passcode?: string,
-    title?: string,
-    specialty?: string
+    fullName?: string
   ) => {
-    setLoading(true);
-    try {
-      const res = await apiSignUp(
-        email,
-        password,
-        fullName,
-        'staff',
-        passcode,
-        { title, specialty }
-      );
-      if (res.error) {
-        setLoading(false);
-        return { error: res.error };
-      }
-      setUser(res.user);
-      setLoading(false);
-      router.push('/staff/dashboard');
-      return {};
-    } catch (err: any) {
-      setLoading(false);
-      return { error: err.message || 'Staff registration failed' };
+    if (fullName) {
+      PROTOTYPE_STAFF.full_name = fullName;
     }
+    switchRole('staff');
+    return {};
   };
 
-  // Public Registration: Patients Only
-  const signUp = async (email: string, password?: string, fullName?: string) => {
-    setLoading(true);
-    try {
-      const res = await apiSignUp(email, password, fullName, 'patient');
-      if (res.error) {
-        setLoading(false);
-        return { error: res.error };
-      }
-      setUser(res.user);
-      setLoading(false);
-      router.push('/patient/dashboard');
-      return {};
-    } catch (err: any) {
-      setLoading(false);
-      return { error: err.message || 'Sign up failed' };
+  const signUp = async (
+    email?: string,
+    password?: string,
+    fullName?: string
+  ) => {
+    if (fullName) {
+      PROTOTYPE_PATIENT.full_name = fullName;
     }
+    switchRole('patient');
+    return {};
   };
 
   const logout = async () => {
-    setLoading(true);
-    await apiLogout();
-    setUser(null);
-    setLoading(false);
-    router.push('/login');
+    router.push('/');
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        loading,
+        loading: false,
         login,
         loginStaff,
         registerStaff,
         signUp,
         logout,
+        switchRole,
       }}
     >
       {children}
