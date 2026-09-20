@@ -53,7 +53,7 @@ The Hospital Portal is a full-stack healthcare web application built using the *
 
 ## 2. Authentication & Role-Based Access Control (RBAC)
 
-The application enforces **strict perimeter isolation** between patients and clinical staff:
+Patient and clinical staff accounts are separated at both the application and database layers:
 
 ### Patient Perimeter
 - **Registration (`/signup`):** Open to the public. Inserts into `profiles` with `role = 'patient'`.

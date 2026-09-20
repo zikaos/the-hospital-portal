@@ -332,11 +332,11 @@
   <!-- Section 3: Dual-Mode Persistence Layer -->
   <h2>3. Dual-Mode Persistence Architecture (<code>lib/api.ts</code>)</h2>
   <p>
-    The application employs a <strong>resilient dual-mode data architecture</strong>. All high-level business functions (e.g. <code>getAppointments()</code>, <code>createAppointment()</code>, <code>login()</code>) automatically inspect whether live Supabase credentials are configured via <code>isSupabaseConfigured()</code>:
+    The application uses two data sources. Data operations (such as <code>getAppointments()</code>, <code>createAppointment()</code>, <code>login()</code>) check <code>isSupabaseConfigured()</code> to select the active store:
   </p>
   <ul style="margin-left: 20px; margin-bottom: 12px; color: #334155;">
-    <li><strong>Live Cloud Mode (Supabase):</strong> When <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> are provided, operations query Supabase PostgreSQL with strict Row Level Security (RLS) enforcement.</li>
-    <li><strong>Graceful Mock Fallback:</strong> If keys are absent or during offline testing, the system transparently falls back to an in-memory/localStorage mock repository (<code>INITIAL_APPOINTMENTS</code>, <code>INITIAL_MEDICAL_RECORDS</code>) without crashing.</li>
+    <li><strong>Live Cloud Mode (Supabase):</strong> When <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> are set, operations query Supabase PostgreSQL with Row Level Security (RLS).</li>
+    <li><strong>Mock Fallback:</strong> If keys are absent or during offline testing, the system falls back to an in-memory/localStorage mock repository (<code>INITIAL_APPOINTMENTS</code>, <code>INITIAL_MEDICAL_RECORDS</code>).</li>
   </ul>
 
   <!-- Page Break -->
@@ -345,7 +345,7 @@
   <!-- Section 4: Security & Staff Isolation -->
   <h2>4. Authentication Architecture & Staff Isolation</h2>
   <p>
-    A critical architectural requirement is the <strong>absolute isolation of clinical staff privileges</strong> from self-service patient onboarding.
+    Clinical staff accounts are separated from patient registration at both the routing and database layers.
   </p>
 
   <div class="grid-2 avoid-break">

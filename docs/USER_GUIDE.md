@@ -7,14 +7,14 @@
 
 ---
 
-## 1. Welcome to The Hospital Portal
+## 1. Overview
 
-**The Hospital Portal** is a patient-centric, web-based healthcare platform designed to make clinical care accessible, understandable, and stress-free. Whether you are scheduling a check-up, checking lab results, or reviewing prescriptions, the portal gives you immediate access without long phone queues or complicated paperwork.
+**The Hospital Portal** is a web-based healthcare platform for scheduling check-ups, checking lab results, and reviewing prescriptions without phone queues or paper forms.
 
 ### Core Principles
-- **Clear Clinical Communication:** Every diagnosis, medication frequency, and appointment status is written in plain, accessible language.
-- **Privacy & Protection:** Your medical records are protected by database-level security policies (Row Level Security), guaranteeing that only you and your verified healthcare team can view your health data.
-- **Works on Any Device:** Fully responsive across mobile phones, tablets, and desktop computers without installing any app from an app store.
+- **Clear Clinical Communication:** Diagnoses, medication instructions, and appointment statuses use plain language.
+- **Data Isolation:** Records are protected by PostgreSQL Row Level Security (RLS) so only you and your attending clinical team have access.
+- **Standard Browser Support:** Runs on phones, tablets, and desktop computers without installing an app.
 
 ---
 
