@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/i18n';
 import { getMyProfile, updateMyProfile } from '@/lib/api';
 import { PatientProfile } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ import { CheckCircle2, AlertCircle, Save } from 'lucide-react';
 
 export default function PatientProfilePage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -76,12 +78,12 @@ export default function PatientProfilePage() {
       });
 
       if (res.success) {
-        setMessage({ type: 'success', text: 'Profile updated successfully.' });
+        setMessage({ type: 'success', text: t('Profile updated successfully.') });
       } else {
-        setMessage({ type: 'error', text: res.error || 'Failed to update profile.' });
+        setMessage({ type: 'error', text: res.error || t('Failed to update profile.') || 'Failed.' });
       }
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'An unexpected error occurred.' });
+      setMessage({ type: 'error', text: err.message || 'An error occurred.' });
     } finally {
       setSaving(false);
     }
@@ -99,9 +101,9 @@ export default function PatientProfilePage() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-[#0A0A0A]">My Profile</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-[#0A0A0A]">{t('My Profile')}</h1>
         <p className="text-[14px] text-[#6B6B6B] mt-0.5">
-          Update your contact details, insurance information, and emergency contact.
+          {t('Personal information and emergency contacts')}
         </p>
       </div>
 
@@ -126,15 +128,15 @@ export default function PatientProfilePage() {
         {/* Contact Info Card */}
         <Card>
           <CardHeader className="pb-3 border-b border-[#E8E8EC]">
-            <CardTitle className="text-[16px]">Contact Information</CardTitle>
+            <CardTitle className="text-[16px]">{t('Contact Details')}</CardTitle>
             <CardDescription className="text-[13px]">
-              Your legal name, phone number, and residential address
+              {t('Personal information and emergency contacts')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="fullName">
-                Full name
+                {t('Full name')}
               </label>
               <Input
                 id="fullName"
@@ -147,7 +149,7 @@ export default function PatientProfilePage() {
 
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="phone">
-                Phone number
+                {t('Phone number')}
               </label>
               <Input
                 id="phone"
@@ -160,7 +162,7 @@ export default function PatientProfilePage() {
 
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="dob">
-                Date of birth
+                {t('Date of Birth')}
               </label>
               <Input
                 id="dob"
@@ -172,30 +174,28 @@ export default function PatientProfilePage() {
 
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="gender">
-                Gender
+                {t('Gender')}
               </label>
               <Select
                 id="gender"
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
               >
-                <option value="Female">Female</option>
-                <option value="Male">Male</option>
-                <option value="Non-Binary">Non-Binary</option>
-                <option value="Other">Prefer not to say</option>
+                <option value="Female">{t('Female')}</option>
+                <option value="Male">{t('Male')}</option>
               </Select>
             </div>
 
             <div className="sm:col-span-2 space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="address">
-                Home address
+                {t('Address')}
               </label>
               <Textarea
                 id="address"
                 rows={2}
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Street address, City, State, ZIP code"
+                placeholder={t('Address')}
               />
             </div>
           </CardContent>
@@ -204,15 +204,15 @@ export default function PatientProfilePage() {
         {/* Insurance Card */}
         <Card>
           <CardHeader className="pb-3 border-b border-[#E8E8EC]">
-            <CardTitle className="text-[16px]">Health Insurance</CardTitle>
+            <CardTitle className="text-[16px]">{t('Insurance Information')}</CardTitle>
             <CardDescription className="text-[13px]">
-              Details of your health insurance plan
+              {t('Insurance Information')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="insuranceProvider">
-                Insurance provider
+                {t('Insurance Provider')}
               </label>
               <Input
                 id="insuranceProvider"
@@ -224,7 +224,7 @@ export default function PatientProfilePage() {
 
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="insuranceNumber">
-                Member ID / Policy number
+                {t('Insurance Policy Number')}
               </label>
               <Input
                 id="insuranceNumber"
@@ -239,15 +239,15 @@ export default function PatientProfilePage() {
         {/* Emergency Contact Card */}
         <Card>
           <CardHeader className="pb-3 border-b border-[#E8E8EC]">
-            <CardTitle className="text-[16px]">Emergency Contact</CardTitle>
+            <CardTitle className="text-[16px]">{t('Emergency Contact')}</CardTitle>
             <CardDescription className="text-[13px]">
-              Someone we can reach in case of an urgent medical situation
+              {t('Emergency Contact')}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="emergencyName">
-                Contact name & relationship
+                {t('Contact Name')}
               </label>
               <Input
                 id="emergencyName"
@@ -259,7 +259,7 @@ export default function PatientProfilePage() {
 
             <div className="space-y-1.5">
               <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="emergencyPhone">
-                Contact phone number
+                {t('Emergency Phone')}
               </label>
               <Input
                 id="emergencyPhone"
@@ -279,7 +279,7 @@ export default function PatientProfilePage() {
               className="gap-2"
             >
               <Save className="h-4 w-4" />
-              {saving ? 'Saving...' : 'Save changes'}
+              {saving ? t('Saving...') : t('Save Changes')}
             </Button>
           </CardFooter>
         </Card>

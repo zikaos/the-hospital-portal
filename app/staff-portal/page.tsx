@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth, CLINIC_STAFF_PASSCODE } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/layout/LanguageToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -32,6 +34,7 @@ export default function StaffPortalPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { loginStaff, registerStaff } = useAuth();
+  const { t } = useLanguage();
 
   const handleStaffSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +54,7 @@ export default function StaffPortalPage() {
     setIsSubmitting(true);
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t('At least 6 characters'));
       setIsSubmitting(false);
       return;
     }
@@ -87,11 +90,14 @@ export default function StaffPortalPage() {
             className="inline-flex items-center gap-1.5 text-xs text-[#6B6B6B] hover:text-[#0A0A0A] transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            Return to The Hospital Portal
+            {t('Return to The Hospital Portal')}
           </Link>
-          <Badge variant="outline" className="text-xs font-medium text-[#6B6B6B]">
-            Staff access
-          </Badge>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <Badge variant="outline" className="text-xs font-medium text-[#6B6B6B]">
+              {t('Staff access')}
+            </Badge>
+          </div>
         </div>
       </header>
 
@@ -102,10 +108,10 @@ export default function StaffPortalPage() {
               <Stethoscope className="h-6 w-6" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-[#0A0A0A]">
-              Staff Portal
+              {t('Staff Portal')}
             </h1>
             <p className="text-sm text-[#6B6B6B] max-w-sm mx-auto">
-              Clinical workspace for physicians, nurses, and administrative personnel.
+              {t('Clinical workspace for physicians, nurses, and administrative personnel.')}
             </p>
           </div>
 
@@ -124,7 +130,7 @@ export default function StaffPortalPage() {
                     : 'border-transparent text-[#6B6B6B] hover:text-[#0A0A0A]'
                 }`}
               >
-                Sign In
+                {t('Sign In')}
               </button>
               <button
                 type="button"
@@ -138,7 +144,7 @@ export default function StaffPortalPage() {
                     : 'border-transparent text-[#6B6B6B] hover:text-[#0A0A0A]'
                 }`}
               >
-                Register Staff
+                {t('Register Staff')}
               </button>
             </div>
 
@@ -155,7 +161,7 @@ export default function StaffPortalPage() {
                 <form onSubmit={handleStaffSignIn} className="space-y-3.5">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="signin-email">
-                      Staff email address
+                      {t('Staff email address')}
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -173,7 +179,7 @@ export default function StaffPortalPage() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="signin-password">
-                      Password
+                      {t('Password')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -181,7 +187,7 @@ export default function StaffPortalPage() {
                         id="signin-password"
                         type="password"
                         required
-                        placeholder="Enter password"
+                        placeholder={t('Enter password')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="pl-10 h-10 rounded-[6px] text-sm"
@@ -192,9 +198,9 @@ export default function StaffPortalPage() {
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="signin-passcode">
-                        Clinic security passcode
+                        {t('Clinic security passcode')}
                       </label>
-                      <span className="text-[11px] text-[#0671B8] font-medium">Required</span>
+                      <span className="text-[11px] text-[#0671B8] font-medium">{t('Required')}</span>
                     </div>
                     <div className="relative">
                       <KeyRound className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -202,7 +208,7 @@ export default function StaffPortalPage() {
                         id="signin-passcode"
                         type="password"
                         required
-                        placeholder="Enter clinic passcode..."
+                        placeholder={t('Enter clinic passcode...')}
                         value={passcode}
                         onChange={(e) => setPasscode(e.target.value)}
                         className="pl-10 h-10 rounded-[6px] text-sm"
@@ -216,7 +222,7 @@ export default function StaffPortalPage() {
                     className="w-full font-medium gap-2 mt-2 h-10 rounded-[6px]"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Signing in...' : 'Sign in to workspace'}
+                    {isSubmitting ? t('Signing in...') : t('Sign in to workspace')}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </form>
@@ -226,9 +232,9 @@ export default function StaffPortalPage() {
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="reg-passcode">
-                        Clinic security passcode
+                        {t('Clinic security passcode')}
                       </label>
-                      <span className="text-[11px] text-[#0671B8] font-medium">Required authorization</span>
+                      <span className="text-[11px] text-[#0671B8] font-medium">{t('Required authorization')}</span>
                     </div>
                     <div className="relative">
                       <KeyRound className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -236,7 +242,7 @@ export default function StaffPortalPage() {
                         id="reg-passcode"
                         type="password"
                         required
-                        placeholder="Enter clinic passcode..."
+                        placeholder={t('Enter clinic passcode...')}
                         value={passcode}
                         onChange={(e) => setPasscode(e.target.value)}
                         className="pl-10 h-10 rounded-[6px] text-sm"
@@ -246,7 +252,7 @@ export default function StaffPortalPage() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="reg-name">
-                      Full name
+                      {t('Full name')}
                     </label>
                     <div className="relative">
                       <User className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -265,7 +271,7 @@ export default function StaffPortalPage() {
                   <div className="grid grid-cols-2 gap-2.5">
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="reg-title">
-                        Title / Role
+                        {t('Title / Role')}
                       </label>
                       <div className="relative">
                         <Award className="absolute left-3 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -283,7 +289,7 @@ export default function StaffPortalPage() {
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="reg-specialty">
-                        Specialty
+                        {t('Specialty')}
                       </label>
                       <div className="relative">
                         <Briefcase className="absolute left-3 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -302,7 +308,7 @@ export default function StaffPortalPage() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="reg-email">
-                      Staff email address
+                      {t('Staff email address')}
                     </label>
                     <div className="relative">
                       <Mail className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -320,7 +326,7 @@ export default function StaffPortalPage() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#0A0A0A] block" htmlFor="reg-password">
-                      Password
+                      {t('Password')}
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-3.5 top-2.5 h-4 w-4 text-[#6B6B6B]" />
@@ -328,7 +334,7 @@ export default function StaffPortalPage() {
                         id="reg-password"
                         type="password"
                         required
-                        placeholder="At least 6 characters"
+                        placeholder={t('At least 6 characters')}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="pl-10 h-10 rounded-[6px] text-sm"
@@ -342,7 +348,7 @@ export default function StaffPortalPage() {
                     className="w-full font-medium gap-2 mt-3 h-10 rounded-[6px]"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? 'Creating staff account...' : 'Create staff account'}
+                    {isSubmitting ? t('Creating staff account...') : t('Create staff account')}
                     <ArrowRight className="h-4 w-4" />
                   </Button>
                 </form>
@@ -354,11 +360,11 @@ export default function StaffPortalPage() {
                   <button
                     type="button"
                     onClick={prefillDemoStaff}
-                    className="w-full flex items-center justify-between p-2.5 rounded-[6px] border border-[#E8E8EC] bg-[#FAFAFA] hover:bg-[#F4F4F6] transition-colors text-left"
+                    className="w-full flex items-center justify-between p-2.5 rounded-[6px] border border-[#E8E8EC] bg-[#FAFAFA] hover:bg-[#F4F4F6] transition-colors text-left rtl:text-right"
                   >
                     <div>
                       <span className="text-xs font-medium text-[#0A0A0A] block">
-                        Demo: Fill Dr. Marcus Vance credentials
+                        {t('Demo: Fill Dr. Marcus Vance credentials')}
                       </span>
                       <span className="text-[11px] text-[#6B6B6B]">
                         dr.vance@clinic.demo / passcode: {CLINIC_STAFF_PASSCODE}
@@ -372,7 +378,7 @@ export default function StaffPortalPage() {
 
             <CardFooter className="flex justify-center border-t border-[#E8E8EC] py-3 bg-[#FAFAFA] text-center rounded-b-[12px]">
               <p className="text-xs text-[#6B6B6B]">
-                Authorized clinic personnel only. Requires clinic security passcode ({CLINIC_STAFF_PASSCODE}).
+                {t('Authorized clinic personnel only. Requires clinic security passcode')} ({CLINIC_STAFF_PASSCODE}).
               </p>
             </CardFooter>
           </Card>

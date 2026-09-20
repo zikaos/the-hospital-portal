@@ -5,8 +5,10 @@ import { Bell, Check, CheckCheck } from 'lucide-react';
 import { getMyNotifications, markNotificationRead } from '@/lib/api';
 import { Notification } from '@/lib/types';
 import { formatDateTime } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
 
 export function NotificationBell() {
+  const { t } = useLanguage();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -65,18 +67,18 @@ export function NotificationBell() {
       >
         <Bell className="h-4 w-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-[#0671B8] ring-2 ring-white" />
+          <span className="absolute top-1.5 end-1.5 flex h-2 w-2 rounded-full bg-[#0671B8] ring-2 ring-white" />
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-[8px] border border-[#E8E8EC] bg-white shadow-lg z-50 overflow-hidden animate-in fade-in duration-100">
+        <div className="absolute end-0 mt-2 w-80 sm:w-96 rounded-[8px] border border-[#E8E8EC] bg-white shadow-lg z-50 overflow-hidden animate-in fade-in duration-100">
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#E8E8EC] bg-[#FAFAFA]">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-[13px] text-[#0A0A0A]">Notifications</span>
+              <span className="font-semibold text-[13px] text-[#0A0A0A]">{t('Notifications')}</span>
               {unreadCount > 0 && (
                 <span className="rounded-full bg-[#0671B8]/12 text-[#0671B8] text-[11px] px-2 py-0.5 font-medium">
-                  {unreadCount} new
+                  {unreadCount} {t('new')}
                 </span>
               )}
             </div>
@@ -87,7 +89,7 @@ export function NotificationBell() {
                 className="text-[12px] text-[#0671B8] hover:underline font-medium flex items-center gap-1"
               >
                 <CheckCheck className="h-3 w-3" />
-                Mark all read
+                {t('Mark all read')}
               </button>
             )}
           </div>
@@ -95,7 +97,7 @@ export function NotificationBell() {
           <div className="max-h-80 overflow-y-auto divide-y divide-[#E8E8EC]">
             {notifications.length === 0 ? (
               <div className="py-8 text-center text-[13px] text-[#9C9C9C]">
-                No notifications right now.
+                {t('No notifications right now.')}
               </div>
             ) : (
               notifications.map((n) => (
@@ -117,7 +119,7 @@ export function NotificationBell() {
                     <button
                       type="button"
                       onClick={(e) => handleMarkAsRead(n.id, e)}
-                      title="Mark as read"
+                      title={t('Mark as read')}
                       className="p-1 rounded text-[#0671B8] hover:bg-[#0671B8]/10 flex-shrink-0 transition-colors"
                       aria-label="Mark as read"
                     >

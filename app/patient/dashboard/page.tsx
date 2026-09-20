@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/i18n';
 import { getMyAppointments, getMyPrescriptions, getMyNotifications, cancelAppointment } from '@/lib/api';
 import { Appointment, Prescription, Notification } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import {
   Bell,
   Clock,
   ArrowRight,
+  ArrowLeft,
   Plus,
   User,
   CheckCircle2,
@@ -24,11 +26,14 @@ import {
 
 export default function PatientDashboardPage() {
   const { user } = useAuth();
+  const { t, isRTL } = useLanguage();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
+
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   const loadData = async () => {
     try {
@@ -52,10 +57,10 @@ export default function PatientDashboardPage() {
   }, [user]);
 
   const handleCancel = async (id: string) => {
-    if (!confirm('Are you sure you want to cancel this appointment?')) return;
+    if (!confirm(t('Are you sure you want to cancel this appointment?') || 'Cancel appointment?')) return;
     const res = await cancelAppointment(id);
     if (res.success) {
-      setActionSuccess('Appointment cancelled.');
+      setActionSuccess(t('Appointment cancelled.'));
       loadData();
       setTimeout(() => setActionSuccess(null), 4000);
     }
@@ -91,10 +96,10 @@ export default function PatientDashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E8EC]">
         <div>
           <h1 className="text-2xl font-bold text-[#0A0A0A] tracking-tight">
-            Welcome, {user?.full_name || 'Patient'}
+            {t('Welcome,')} {user?.full_name || t('Patient')}
           </h1>
           <p className="text-[14px] text-[#6B6B6B] mt-0.5">
-            Here is an overview of your visits, medications, and messages.
+            {t('Here is an overview of your visits, medications, and messages.')}
           </p>
         </div>
 
@@ -102,13 +107,13 @@ export default function PatientDashboardPage() {
           <Link href="/patient/appointments">
             <Button variant="primary" size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" />
-              Book appointment
+              {t('Book appointment')}
             </Button>
           </Link>
           <Link href="/patient/profile">
             <Button variant="secondary" size="sm" className="gap-1.5">
               <User className="h-4 w-4" />
-              My profile
+              {t('My profile')}
             </Button>
           </Link>
         </div>
@@ -129,18 +134,18 @@ export default function PatientDashboardPage() {
             <div>
               <CardTitle className="text-[16px] flex items-center gap-2 font-bold">
                 <CalendarCheck className="h-4 w-4 text-[#0671B8]" />
-                Next appointment
+                {t('Next appointment')}
               </CardTitle>
               <CardDescription className="text-[12px]">
-                Your next scheduled consultation
+                {t('Your next scheduled consultation')}
               </CardDescription>
             </div>
             <Link
               href="/patient/appointments"
               className="text-[12px] font-medium text-[#0671B8] hover:underline flex items-center gap-1"
             >
-              All appointments
-              <ArrowRight className="h-3 w-3" />
+              {t('All appointments')}
+              <ArrowIcon className="h-3 w-3" />
             </Link>
           </CardHeader>
 
@@ -150,7 +155,7 @@ export default function PatientDashboardPage() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2">
                     <Badge variant={nextAppointment.status}>
-                      {nextAppointment.status.charAt(0).toUpperCase() + nextAppointment.status.slice(1)}
+                      {t(nextAppointment.status)}
                     </Badge>
                     <span className="text-[13px] text-[#6B6B6B] flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5 text-[#9C9C9C]" />
@@ -160,11 +165,11 @@ export default function PatientDashboardPage() {
 
                   <div>
                     <h2 className="text-[15px] font-semibold text-[#0A0A0A]">
-                      {nextAppointment.reason || 'General checkup'}
+                      {t(nextAppointment.reason || 'General checkup')}
                     </h2>
                     <p className="text-[13px] text-[#6B6B6B] flex items-center gap-1 mt-0.5">
                       <Stethoscope className="h-3.5 w-3.5 text-[#9C9C9C]" />
-                      Doctor: {nextAppointment.staff?.full_name || 'Clinic doctor'}
+                      {t('Doctor:')} {nextAppointment.staff?.full_name || t('Clinic doctor')}
                     </p>
                   </div>
                 </div>
@@ -176,7 +181,7 @@ export default function PatientDashboardPage() {
                       size="sm"
                       onClick={() => handleCancel(nextAppointment.id)}
                     >
-                      Cancel
+                      {t('Cancel')}
                     </Button>
                   )}
                 </div>
@@ -184,13 +189,13 @@ export default function PatientDashboardPage() {
             ) : (
               <div className="text-center py-7 rounded-[8px] border border-dashed border-[#E8E8EC] bg-[#FAFAFA]">
                 <Calendar className="h-7 w-7 text-[#9C9C9C] mx-auto mb-2" />
-                <p className="text-[14px] font-medium text-[#0A0A0A]">No upcoming appointments</p>
+                <p className="text-[14px] font-medium text-[#0A0A0A]">{t('No upcoming appointments')}</p>
                 <p className="text-[13px] text-[#6B6B6B] mt-0.5">
-                  Schedule a visit whenever you need to see a doctor.
+                  {t('Schedule a visit whenever you need to see a doctor.')}
                 </p>
                 <Link href="/patient/appointments" className="inline-block mt-3">
                   <Button variant="primary" size="sm">
-                    Schedule a visit
+                    {t('Schedule a visit')}
                   </Button>
                 </Link>
               </div>
@@ -204,21 +209,21 @@ export default function PatientDashboardPage() {
             <div className="flex items-center justify-between">
               <CardTitle className="text-[16px] flex items-center gap-2 font-bold">
                 <Bell className="h-4 w-4 text-[#0671B8]" />
-                Recent updates
+                {t('Recent updates')}
               </CardTitle>
               {unreadNotifications.length > 0 && (
                 <span className="text-[11px] bg-[#0671B8]/12 text-[#0671B8] font-medium px-2 py-0.5 rounded-full">
-                  {unreadNotifications.length} new
+                  {unreadNotifications.length} {t('new')}
                 </span>
               )}
             </div>
             <CardDescription className="text-[12px]">
-              Messages from your clinic
+              {t('Messages from your clinic')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {notifications.length === 0 ? (
-              <p className="text-[13px] text-[#9C9C9C] py-5 text-center">No new messages</p>
+              <p className="text-[13px] text-[#9C9C9C] py-5 text-center">{t('No new messages')}</p>
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                 {notifications.slice(0, 4).map((n) => (
@@ -246,25 +251,25 @@ export default function PatientDashboardPage() {
           <div>
             <CardTitle className="text-[16px] flex items-center gap-2 font-bold">
               <Pill className="h-4 w-4 text-[#00A8A7]" />
-              Active prescriptions
+              {t('Active prescriptions')}
             </CardTitle>
             <CardDescription className="text-[12px]">
-              Medications you are currently taking
+              {t('Medications you are currently taking')}
             </CardDescription>
           </div>
           <Link
             href="/patient/prescriptions"
             className="text-[12px] font-medium text-[#0671B8] hover:underline flex items-center gap-1"
           >
-            All prescriptions
-            <ArrowRight className="h-3 w-3" />
+            {t('All prescriptions')}
+            <ArrowIcon className="h-3 w-3" />
           </Link>
         </CardHeader>
 
         <CardContent>
           {activePrescriptions.length === 0 ? (
             <div className="text-center py-6 text-[13px] text-[#9C9C9C]">
-              No active prescriptions on file.
+              {t('No active prescriptions on file.')}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
@@ -275,15 +280,15 @@ export default function PatientDashboardPage() {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <h2 className="font-semibold text-[#0A0A0A] text-[14px]">{rx.medication_name}</h2>
-                    <Badge variant="active">Active</Badge>
+                    <Badge variant="active">{t('Active')}</Badge>
                   </div>
                   <div className="text-[13px] text-[#6B6B6B] space-y-0.5">
-                    <p>Dosage: {rx.dosage || 'As directed'}</p>
-                    <p>Frequency: {rx.frequency || 'Daily'}</p>
+                    <p>{t('Dosage:')} {rx.dosage || t('As directed')}</p>
+                    <p>{t('Frequency:')} {rx.frequency || t('Daily')}</p>
                   </div>
                   <div className="pt-2 border-t border-[#E8E8EC] flex items-center justify-between text-[11px] text-[#9C9C9C]">
-                    <span>Started: {formatDate(rx.start_date)}</span>
-                    <span>Doctor: {rx.staff?.full_name || 'Clinic physician'}</span>
+                    <span>{t('Started:')} {formatDate(rx.start_date)}</span>
+                    <span>{t('Doctor:')} {rx.staff?.full_name || t('Clinic physician')}</span>
                   </div>
                 </div>
               ))}

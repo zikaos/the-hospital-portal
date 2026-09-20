@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { formatDate, formatDateTime } from '@/lib/utils';
+import { useLanguage } from '@/lib/i18n';
 import {
   User,
   Clock,
@@ -28,6 +29,7 @@ import {
 } from 'lucide-react';
 
 export default function StaffPatientDetailPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const router = useRouter();
   const patientId = params.id as string;
@@ -171,10 +173,10 @@ export default function StaffPatientDetailPage() {
   if (!profile) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm font-semibold text-textPrimary">Patient not found</p>
+        <p className="text-sm font-semibold text-textPrimary">{t('Patient not found')}</p>
         <Link href="/staff/patients" className="mt-4 inline-block">
           <Button variant="outline" size="sm" className="rounded-[6px]">
-            Back to patient list
+            {t('Back to patient list')}
           </Button>
         </Link>
       </div>
@@ -188,8 +190,8 @@ export default function StaffPatientDetailPage() {
         <div className="flex items-center gap-3">
           <Link href="/staff/patients">
             <Button variant="ghost" size="sm" className="gap-1.5 text-textSecondary hover:text-textPrimary rounded-[6px]">
-              <ArrowLeft className="h-4 w-4" />
-              Patients
+              <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+              {t('Patients')}
             </Button>
           </Link>
           <div>
@@ -197,7 +199,7 @@ export default function StaffPatientDetailPage() {
               {profile.full_name}
             </h1>
             <p className="text-xs text-textSecondary">
-              Patient chart & medical history
+              {t('Patient chart & medical history')}
             </p>
           </div>
         </div>
@@ -210,7 +212,7 @@ export default function StaffPatientDetailPage() {
             className="gap-1.5 text-xs font-medium rounded-[6px]"
           >
             <Plus className="h-3.5 w-3.5" />
-            Add record
+            {t('Add record')}
           </Button>
           <Button
             size="sm"
@@ -218,7 +220,7 @@ export default function StaffPatientDetailPage() {
             className="gap-1.5 text-xs font-medium rounded-[6px]"
           >
             <Plus className="h-3.5 w-3.5" />
-            Add prescription
+            {t('Add prescription')}
           </Button>
         </div>
       </div>
@@ -244,7 +246,7 @@ export default function StaffPatientDetailPage() {
             onClick={() => setMessage(null)}
             className="text-textSecondary hover:text-textPrimary text-xs"
           >
-            Dismiss
+            {t('Dismiss')}
           </button>
         </div>
       )}
@@ -254,45 +256,45 @@ export default function StaffPatientDetailPage() {
         <CardHeader className="pb-3 border-b border-border">
           <CardTitle className="text-sm font-semibold text-textPrimary flex items-center gap-2">
             <User className="h-4 w-4 text-textSecondary" />
-            Patient details
+            {t('Patient details')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
           <div>
-            <span className="text-textSecondary block">Phone & email</span>
+            <span className="text-textSecondary block">{t('Phone & email')}</span>
             <span className="font-medium text-textPrimary mt-0.5 block">
-              {profile.phone || 'None provided'}
+              {profile.phone || t('None provided')}
             </span>
             <span className="text-textSecondary">{profile.email || ''}</span>
           </div>
 
           <div>
-            <span className="text-textSecondary block">Date of birth</span>
+            <span className="text-textSecondary block">{t('Date of birth')}</span>
             <span className="font-medium text-textPrimary mt-0.5 block">
-              {patient?.date_of_birth ? formatDate(patient.date_of_birth) : 'Not specified'}
+              {patient?.date_of_birth ? formatDate(patient.date_of_birth) : t('Not specified')}
             </span>
-            <span className="text-textSecondary">{patient?.gender || 'Unspecified'}</span>
+            <span className="text-textSecondary">{patient?.gender ? t(patient.gender) : t('Unspecified')}</span>
           </div>
 
           <div>
-            <span className="text-textSecondary block">Insurance</span>
+            <span className="text-textSecondary block">{t('Insurance')}</span>
             <span className="font-medium text-textPrimary mt-0.5 block">
-              {patient?.insurance_provider || 'Self-pay'}
+              {patient?.insurance_provider || t('Self-pay')}
             </span>
-            <span className="text-textSecondary">{patient?.insurance_number || 'No ID on file'}</span>
+            <span className="text-textSecondary">{patient?.insurance_number || t('No ID on file')}</span>
           </div>
 
           <div>
-            <span className="text-textSecondary block">Emergency contact</span>
+            <span className="text-textSecondary block">{t('Emergency contact')}</span>
             <span className="font-medium text-textPrimary mt-0.5 block">
-              {patient?.emergency_contact_name || 'None listed'}
+              {patient?.emergency_contact_name || t('None listed')}
             </span>
-            <span className="text-textSecondary">{patient?.emergency_contact_phone || 'No phone'}</span>
+            <span className="text-textSecondary">{patient?.emergency_contact_phone || t('No phone')}</span>
           </div>
 
           {patient?.address && (
             <div className="sm:col-span-2 lg:col-span-4 pt-2 border-t border-border">
-              <span className="text-textSecondary">Address: </span>
+              <span className="text-textSecondary">{t('Address')}: </span>
               <span className="text-textPrimary font-medium">{patient.address}</span>
             </div>
           )}
@@ -304,10 +306,10 @@ export default function StaffPatientDetailPage() {
         <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border">
           <div>
             <CardTitle className="text-base font-semibold text-textPrimary">
-              Medical records ({records.length})
+              {t('Medical records')} ({records.length})
             </CardTitle>
             <CardDescription className="text-xs text-textSecondary">
-              Lab tests, diagnostic reports, and visit summaries.
+              {t('Lab tests, diagnostic reports, and visit summaries.')}
             </CardDescription>
           </div>
           <Button
@@ -317,14 +319,14 @@ export default function StaffPatientDetailPage() {
             className="text-xs gap-1 rounded-[6px]"
           >
             <Plus className="h-3 w-3" />
-            Add record
+            {t('Add record')}
           </Button>
         </CardHeader>
 
         <CardContent className="p-0">
           {records.length === 0 ? (
             <div className="p-8 text-center text-xs text-textSecondary">
-              No medical records entered for this patient yet.
+              {t('No medical records entered for this patient yet.')}
             </div>
           ) : (
             <div className="divide-y divide-border">
@@ -334,10 +336,10 @@ export default function StaffPatientDetailPage() {
                     <div className="flex items-center gap-2">
                       <h2 className="font-medium text-textPrimary text-sm">{r.title}</h2>
                       <Badge variant="outline" className="text-xs capitalize">
-                        {r.record_type.replace('_', ' ')}
+                        {t(r.record_type.replace('_', ' '))}
                       </Badge>
                     </div>
-                    <span className="text-xs text-textSecondary">Date: {formatDate(r.record_date)}</span>
+                    <span className="text-xs text-textSecondary">{t('Date')}: {formatDate(r.record_date)}</span>
                   </div>
 
                   {r.description && (
@@ -347,7 +349,7 @@ export default function StaffPatientDetailPage() {
                   )}
 
                   <div className="flex items-center justify-between text-xs text-textSecondary pt-1">
-                    <span>By: {r.staff?.full_name || 'Staff doctor'}</span>
+                    <span>{t('By')}: {r.staff?.full_name || t('Staff doctor')}</span>
                     {r.file_path && (
                       <span className="inline-flex items-center gap-1 font-medium text-primary">
                         <Paperclip className="h-3 w-3" />
@@ -367,10 +369,10 @@ export default function StaffPatientDetailPage() {
         <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-border">
           <div>
             <CardTitle className="text-base font-semibold text-textPrimary">
-              Prescriptions ({prescriptions.length})
+              {t('Prescriptions')} ({prescriptions.length})
             </CardTitle>
             <CardDescription className="text-xs text-textSecondary">
-              Medications prescribed for this patient.
+              {t('Medications prescribed for this patient.')}
             </CardDescription>
           </div>
           <Button
@@ -380,24 +382,24 @@ export default function StaffPatientDetailPage() {
             className="text-xs gap-1 rounded-[6px]"
           >
             <Plus className="h-3 w-3" />
-            Add prescription
+            {t('Add prescription')}
           </Button>
         </CardHeader>
 
         <CardContent className="p-0">
           {prescriptions.length === 0 ? (
             <div className="p-8 text-center text-xs text-textSecondary">
-              No prescriptions registered for this patient.
+              {t('No prescriptions registered for this patient.')}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border">
-                  <TableHead className="text-xs font-medium text-textSecondary">Medication</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Dosage & frequency</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Dates</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Status</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Instructions</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Medication')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Dosage & frequency')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Dates')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Status')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Instructions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -407,22 +409,22 @@ export default function StaffPatientDetailPage() {
                       {rx.medication_name}
                     </TableCell>
                     <TableCell className="text-xs">
-                      <span className="font-medium text-textPrimary">{rx.dosage || 'Standard'}</span>
-                      <span className="text-textSecondary block">{rx.frequency || 'Daily'}</span>
+                      <span className="font-medium text-textPrimary">{rx.dosage || t('Standard')}</span>
+                      <span className="text-textSecondary block">{rx.frequency || t('Daily')}</span>
                     </TableCell>
                     <TableCell className="text-xs text-textSecondary">
-                      <span>Start: {formatDate(rx.start_date)}</span>
-                      {rx.end_date && <span className="block">End: {formatDate(rx.end_date)}</span>}
+                      <span>{t('Start')}: {formatDate(rx.start_date)}</span>
+                      {rx.end_date && <span className="block">{t('End')}: {formatDate(rx.end_date)}</span>}
                     </TableCell>
                     <TableCell>
                       <Badge variant={rx.status === 'active' ? 'active' : 'secondary'}>
-                        {rx.status.charAt(0).toUpperCase() + rx.status.slice(1)}
+                        {t(rx.status)}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-xs text-textPrimary max-w-xs">
                       {rx.notes && <p className="text-textSecondary mb-0.5">{rx.notes}</p>}
                       <span className="text-xs text-textSecondary">
-                        By {rx.staff?.full_name || 'Dr. Vance'}
+                        {t('By')} {rx.staff?.full_name || 'Dr. Vance'}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -438,22 +440,22 @@ export default function StaffPatientDetailPage() {
         <CardHeader className="pb-3 border-b border-border">
           <CardTitle className="text-base font-semibold text-textPrimary flex items-center gap-2">
             <Clock className="h-4 w-4 text-textSecondary" />
-            Appointment history ({appointments.length})
+            {t('Appointment history')} ({appointments.length})
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {appointments.length === 0 ? (
             <div className="p-8 text-center text-xs text-textSecondary">
-              No appointments on record for this patient.
+              {t('No appointments on record for this patient.')}
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border">
-                  <TableHead className="text-xs font-medium text-textSecondary">Date & time</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Reason</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Status</TableHead>
-                  <TableHead className="text-right text-xs font-medium text-textSecondary">Update status</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Date & time')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Reason')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Status')}</TableHead>
+                  <TableHead className="text-end text-xs font-medium text-textSecondary">{t('Update status')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -463,14 +465,14 @@ export default function StaffPatientDetailPage() {
                       {formatDateTime(apt.scheduled_at)}
                     </TableCell>
                     <TableCell className="text-xs text-textPrimary max-w-sm">
-                      {apt.reason || 'General consultation'}
+                      {apt.reason || t('General consultation')}
                     </TableCell>
                     <TableCell>
                       <Badge variant={apt.status}>
-                        {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                        {t(apt.status)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right whitespace-nowrap">
+                    <TableCell className="text-end whitespace-nowrap">
                       <div className="inline-flex items-center gap-1">
                         {apt.status === 'pending' && (
                           <Button
@@ -479,8 +481,8 @@ export default function StaffPatientDetailPage() {
                             onClick={() => handleStatusChange(apt.id, 'confirmed')}
                             className="rounded-[6px] text-xs h-7 px-2 text-secondary border-secondary/30 hover:bg-secondary/10"
                           >
-                            <Check className="h-3 w-3 mr-1" />
-                            Confirm
+                            <Check className="h-3 w-3 me-1" />
+                            {t('Confirm')}
                           </Button>
                         )}
                         {apt.status === 'confirmed' && (
@@ -490,8 +492,8 @@ export default function StaffPatientDetailPage() {
                             onClick={() => handleStatusChange(apt.id, 'completed')}
                             className="rounded-[6px] text-xs h-7 px-2 text-primary border-primary/30 hover:bg-primary/10"
                           >
-                            <CheckCheck className="h-3 w-3 mr-1" />
-                            Complete
+                            <CheckCheck className="h-3 w-3 me-1" />
+                            {t('Complete')}
                           </Button>
                         )}
                         {apt.status !== 'cancelled' && apt.status !== 'completed' && (
@@ -518,16 +520,16 @@ export default function StaffPatientDetailPage() {
       <Dialog open={isRecordModalOpen} onOpenChange={setIsRecordModalOpen}>
         <DialogContent onClose={() => setIsRecordModalOpen(false)}>
           <DialogHeader>
-            <DialogTitle>Add medical record</DialogTitle>
+            <DialogTitle>{t('Add medical record')}</DialogTitle>
             <DialogDescription>
-              Upload or add a report, lab result, or visit summary for {profile.full_name}.
+              {t('Upload or add a report, lab result, or visit summary for')} {profile.full_name}.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddRecord} className="space-y-4 pt-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-textPrimary block" htmlFor="recordTypeSelect">
-                Record category
+                {t('Record category')}
               </label>
               <Select
                 id="recordTypeSelect"
@@ -535,15 +537,15 @@ export default function StaffPatientDetailPage() {
                 onChange={(e) => setRecordType(e.target.value as MedicalRecordType)}
                 className="rounded-[6px]"
               >
-                <option value="lab_result">Lab result</option>
-                <option value="visit_summary">Visit summary</option>
-                <option value="diagnosis">Diagnosis</option>
+                <option value="lab_result">{t('Lab result')}</option>
+                <option value="visit_summary">{t('Visit summary')}</option>
+                <option value="diagnosis">{t('Diagnosis')}</option>
               </Select>
             </div>
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-textPrimary block" htmlFor="recordTitle">
-                Record title
+                {t('Record title')}
               </label>
               <Input
                 id="recordTitle"
@@ -557,7 +559,7 @@ export default function StaffPatientDetailPage() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-textPrimary block" htmlFor="recordDesc">
-                Notes & clinical details
+                {t('Notes & clinical details')}
               </label>
               <Textarea
                 id="recordDesc"
@@ -571,7 +573,7 @@ export default function StaffPatientDetailPage() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-textPrimary block" htmlFor="recordFileUpload">
-                Attach document (optional)
+                {t('Attach document (optional)')}
               </label>
               <div className="border border-dashed border-border rounded-[6px] p-3 text-center bg-neutral-50">
                 <input
@@ -581,7 +583,7 @@ export default function StaffPatientDetailPage() {
                   className="text-xs text-textSecondary file:mr-2 file:py-1 file:px-2.5 file:rounded-[4px] file:border-0 file:text-xs file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/15 cursor-pointer"
                 />
                 <p className="text-xs text-textSecondary mt-1">
-                  Supported formats: PDF, PNG, JPG.
+                  {t('Supported formats: PDF, PNG, JPG.')}
                 </p>
               </div>
             </div>
@@ -594,14 +596,14 @@ export default function StaffPatientDetailPage() {
                 disabled={isSubmitting}
                 className="rounded-[6px]"
               >
-                Cancel
+                {t('Cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
                 className="rounded-[6px]"
               >
-                {isSubmitting ? 'Saving...' : 'Save record'}
+                {isSubmitting ? t('Saving...') : t('Save record')}
               </Button>
             </DialogFooter>
           </form>
@@ -612,16 +614,16 @@ export default function StaffPatientDetailPage() {
       <Dialog open={isRxModalOpen} onOpenChange={setIsRxModalOpen}>
         <DialogContent onClose={() => setIsRxModalOpen(false)}>
           <DialogHeader>
-            <DialogTitle>Add prescription</DialogTitle>
+            <DialogTitle>{t('Add prescription')}</DialogTitle>
             <DialogDescription>
-              Create a new prescription for {profile.full_name}.
+              {t('Create a new prescription for')} {profile.full_name}.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleAddPrescription} className="space-y-4 pt-4">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-textPrimary block" htmlFor="rxName">
-                Medication name
+                {t('Medication name')}
               </label>
               <Input
                 id="rxName"
@@ -636,7 +638,7 @@ export default function StaffPatientDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-textPrimary block" htmlFor="rxDosage">
-                  Dosage
+                  {t('Dosage')}
                 </label>
                 <Input
                   id="rxDosage"
@@ -649,7 +651,7 @@ export default function StaffPatientDetailPage() {
 
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-textPrimary block" htmlFor="rxFrequency">
-                  Frequency
+                  {t('Frequency')}
                 </label>
                 <Input
                   id="rxFrequency"
@@ -664,7 +666,7 @@ export default function StaffPatientDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-textPrimary block" htmlFor="rxStartDate">
-                  Start date
+                  {t('Start date')}
                 </label>
                 <Input
                   id="rxStartDate"
@@ -677,7 +679,7 @@ export default function StaffPatientDetailPage() {
 
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-textPrimary block" htmlFor="rxEndDate">
-                  End date (optional)
+                  {t('End date (optional)')}
                 </label>
                 <Input
                   id="rxEndDate"
@@ -691,7 +693,7 @@ export default function StaffPatientDetailPage() {
 
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-textPrimary block" htmlFor="rxNotes">
-                Instructions / Notes
+                {t('Instructions / Notes')}
               </label>
               <Textarea
                 id="rxNotes"
@@ -711,14 +713,14 @@ export default function StaffPatientDetailPage() {
                 disabled={isSubmitting}
                 className="rounded-[6px]"
               >
-                Cancel
+                {t('Cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={isSubmitting}
                 className="rounded-[6px]"
               >
-                {isSubmitting ? 'Saving...' : 'Save prescription'}
+                {isSubmitting ? t('Saving...') : t('Save prescription')}
               </Button>
             </DialogFooter>
           </form>

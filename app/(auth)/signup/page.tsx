@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/i18n';
+import { LanguageToggle } from '@/components/layout/LanguageToggle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -15,6 +17,7 @@ export default function SignUpPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signUp } = useAuth();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +25,7 @@ export default function SignUpPage() {
     setIsSubmitting(true);
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      setError(t('At least 6 characters'));
       setIsSubmitting(false);
       return;
     }
@@ -36,20 +39,23 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAFAFA] text-[#0A0A0A]">
-      <header className="border-b border-[#E8E8EC] bg-white h-14 flex items-center px-6">
+      <header className="border-b border-[#E8E8EC] bg-white h-14 flex items-center justify-between px-6">
         <Link href="/" className="inline-flex items-center gap-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-[6px] bg-[#0671B8] text-white">
             <Activity className="h-4 w-4" />
           </div>
-          <span className="text-[16px] font-bold tracking-tight text-[#0A0A0A]">The Hospital Portal</span>
+          <span className="text-[16px] font-bold tracking-tight text-[#0A0A0A]">
+            {t('The Hospital Portal')}
+          </span>
         </Link>
+        <LanguageToggle />
       </header>
 
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-[400px] space-y-6">
           <div className="text-center space-y-1">
-            <h1 className="text-2xl font-bold text-[#0A0A0A] tracking-tight">Create an account</h1>
-            <p className="text-[14px] text-[#6B6B6B]">Register to view your records and book visits</p>
+            <h1 className="text-2xl font-bold text-[#0A0A0A] tracking-tight">{t('Create an account')}</h1>
+            <p className="text-[14px] text-[#6B6B6B]">{t('Register to view your records and book visits')}</p>
           </div>
 
           <Card className="border-[#E8E8EC] bg-white shadow-card">
@@ -64,7 +70,7 @@ export default function SignUpPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1.5">
                   <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="fullName">
-                    Full name
+                    {t('Full name')}
                   </label>
                   <Input
                     id="fullName"
@@ -78,7 +84,7 @@ export default function SignUpPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="email">
-                    Email address
+                    {t('Email address')}
                   </label>
                   <Input
                     id="email"
@@ -92,13 +98,13 @@ export default function SignUpPage() {
 
                 <div className="space-y-1.5">
                   <label className="text-[13px] font-medium text-[#0A0A0A] block" htmlFor="password">
-                    Password
+                    {t('Password')}
                   </label>
                   <Input
                     id="password"
                     type="password"
                     required
-                    placeholder="At least 6 characters"
+                    placeholder={t('At least 6 characters')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -110,16 +116,16 @@ export default function SignUpPage() {
                   className="w-full mt-2 font-medium"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Creating account...' : 'Create account'}
+                  {isSubmitting ? t('Creating account...') : t('Create account')}
                 </Button>
               </form>
             </CardContent>
 
             <CardFooter className="flex justify-center border-t border-[#E8E8EC] py-3.5 bg-[#FAFAFA] text-center">
               <p className="text-[13px] text-[#6B6B6B]">
-                Already have an account?{' '}
+                {t('Already have an account?')}{' '}
                 <Link href="/login" className="text-[#0671B8] font-medium hover:underline">
-                  Sign in
+                  {t('Sign in')}
                 </Link>
               </p>
             </CardFooter>

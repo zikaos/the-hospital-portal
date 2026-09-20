@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
+import { useLanguage } from '@/lib/i18n';
 import { getStaffQueue, updateAppointmentStatus } from '@/lib/api';
 import { Appointment, AppointmentStatus } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -23,6 +24,7 @@ import {
 
 export default function StaffDashboardPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [queue, setQueue] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterMode, setFilterMode] = useState<'today' | 'all'>('today');
@@ -46,7 +48,7 @@ export default function StaffDashboardPage() {
   const handleStatusChange = async (id: string, newStatus: AppointmentStatus) => {
     const res = await updateAppointmentStatus(id, newStatus);
     if (res.success) {
-      setActionMessage(`Appointment updated to ${newStatus}.`);
+      setActionMessage(`${t('Appointment updated to')} ${t(newStatus)}.`);
       loadQueue();
       setTimeout(() => setActionMessage(null), 3000);
     }
@@ -76,10 +78,10 @@ export default function StaffDashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-textPrimary">
-            Appointments
+            {t('Today’s Queue')}
           </h1>
           <p className="text-sm text-textSecondary mt-1">
-            Welcome back, {user?.full_name || 'Staff'}. Review upcoming visits and update statuses.
+            {t('Welcome back,')} {user?.full_name || t('Staff')}. {t('Review upcoming visits and update statuses.')}
           </p>
         </div>
 
@@ -87,7 +89,7 @@ export default function StaffDashboardPage() {
           <Link href="/staff/patients">
             <Button variant="outline" size="sm" className="gap-1.5 rounded-[6px]">
               <User className="h-4 w-4" />
-              Patient directory
+              {t('Patient directory')}
             </Button>
           </Link>
         </div>
@@ -103,22 +105,22 @@ export default function StaffDashboardPage() {
       {/* Metrics Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-[12px] border border-border bg-surface shadow-card hover:shadow-cardHover hover:-translate-y-[2px] transition-all">
-          <p className="text-xs font-medium text-textSecondary">Total appointments</p>
+          <p className="text-xs font-medium text-textSecondary">{t('Total Today')}</p>
           <p className="text-2xl font-bold text-textPrimary mt-1">{queue.length}</p>
         </div>
 
         <div className="p-4 rounded-[12px] border border-border bg-surface shadow-card hover:shadow-cardHover hover:-translate-y-[2px] transition-all">
-          <p className="text-xs font-medium text-warning">Pending review</p>
+          <p className="text-xs font-medium text-warning">{t('Pending Triage')}</p>
           <p className="text-2xl font-bold text-textPrimary mt-1">{pendingCount}</p>
         </div>
 
         <div className="p-4 rounded-[12px] border border-border bg-surface shadow-card hover:shadow-cardHover hover:-translate-y-[2px] transition-all">
-          <p className="text-xs font-medium text-secondary">Confirmed</p>
+          <p className="text-xs font-medium text-secondary">{t('Confirmed')}</p>
           <p className="text-2xl font-bold text-textPrimary mt-1">{confirmedCount}</p>
         </div>
 
         <div className="p-4 rounded-[12px] border border-border bg-surface shadow-card hover:shadow-cardHover hover:-translate-y-[2px] transition-all">
-          <p className="text-xs font-medium text-primary">Completed</p>
+          <p className="text-xs font-medium text-primary">{t('Completed')}</p>
           <p className="text-2xl font-bold text-textPrimary mt-1">{completedCount}</p>
         </div>
       </div>
@@ -129,10 +131,10 @@ export default function StaffDashboardPage() {
           <div>
             <CardTitle className="text-base font-semibold text-textPrimary flex items-center gap-2">
               <Calendar className="h-4 w-4 text-textSecondary" />
-              Appointment list
+              {t('Appointments')}
             </CardTitle>
             <CardDescription className="text-xs text-textSecondary">
-              Confirm appointments, mark visits completed, or open patient charts.
+              {t('Confirm appointments, mark visits completed, or open patient charts.')}
             </CardDescription>
           </div>
 
@@ -146,7 +148,7 @@ export default function StaffDashboardPage() {
                   : 'text-textSecondary hover:text-textPrimary'
               }`}
             >
-              Today
+              {t('Today')}
             </button>
             <button
               type="button"
@@ -157,7 +159,7 @@ export default function StaffDashboardPage() {
                   : 'text-textSecondary hover:text-textPrimary'
               }`}
             >
-              All visits
+              {t('All')}
             </button>
           </div>
         </CardHeader>
@@ -167,21 +169,18 @@ export default function StaffDashboardPage() {
             <div className="text-center py-16 px-4">
               <Clock className="h-10 w-10 text-neutral-300 mx-auto mb-3" />
               <p className="text-sm font-semibold text-textPrimary">
-                {filterMode === 'today' ? 'No appointments scheduled for today' : 'No appointments on file'}
-              </p>
-              <p className="text-xs text-textSecondary mt-1">
-                When patients schedule appointments, they will appear here.
+                {filterMode === 'today' ? t('No appointments scheduled for today') : t('No appointments found')}
               </p>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="border-b border-border">
-                  <TableHead className="text-xs font-medium text-textSecondary">Time & date</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Patient</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Reason</TableHead>
-                  <TableHead className="text-xs font-medium text-textSecondary">Status</TableHead>
-                  <TableHead className="text-right text-xs font-medium text-textSecondary">Actions</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Date & Time')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Patient')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Reason')}</TableHead>
+                  <TableHead className="text-xs font-medium text-textSecondary">{t('Status')}</TableHead>
+                  <TableHead className="text-right rtl:text-left text-xs font-medium text-textSecondary">{t('Actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -204,7 +203,7 @@ export default function StaffDashboardPage() {
                         href={`/staff/patients/${apt.patient_id}`}
                         className="font-medium text-primary hover:underline flex items-center gap-1 text-sm"
                       >
-                        {apt.patient?.full_name || 'Patient'}
+                        {apt.patient?.full_name || t('Patient')}
                         <ArrowUpRight className="h-3.5 w-3.5 text-neutral-400" />
                       </Link>
                       {apt.patient?.phone && (
@@ -214,22 +213,22 @@ export default function StaffDashboardPage() {
 
                     <TableCell className="max-w-xs">
                       <p className="text-textPrimary text-xs sm:text-sm line-clamp-2">
-                        {apt.reason || 'General consultation'}
+                        {t(apt.reason || 'General checkup')}
                       </p>
                       {apt.notes && (
                         <span className="text-xs text-textSecondary block mt-0.5">
-                          Note: {apt.notes}
+                          {t(apt.notes)}
                         </span>
                       )}
                     </TableCell>
 
                     <TableCell>
                       <Badge variant={apt.status}>
-                        {apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}
+                        {t(apt.status)}
                       </Badge>
                     </TableCell>
 
-                    <TableCell className="text-right whitespace-nowrap">
+                    <TableCell className="text-right rtl:text-left whitespace-nowrap">
                       <div className="inline-flex items-center gap-1.5">
                         {apt.status === 'pending' && (
                           <Button
@@ -238,8 +237,8 @@ export default function StaffDashboardPage() {
                             onClick={() => handleStatusChange(apt.id, 'confirmed')}
                             className="rounded-[6px] text-xs h-7 px-2.5 text-secondary border-secondary/30 hover:bg-secondary/10"
                           >
-                            <Check className="h-3 w-3 mr-1" />
-                            Confirm
+                            <Check className="h-3 w-3 mr-1 rtl:ml-1 rtl:mr-0" />
+                            {t('Confirm')}
                           </Button>
                         )}
 
@@ -250,8 +249,8 @@ export default function StaffDashboardPage() {
                             onClick={() => handleStatusChange(apt.id, 'completed')}
                             className="rounded-[6px] text-xs h-7 px-2.5 text-primary border-primary/30 hover:bg-primary/10"
                           >
-                            <CheckCheck className="h-3 w-3 mr-1" />
-                            Complete
+                            <CheckCheck className="h-3 w-3 mr-1 rtl:ml-1 rtl:mr-0" />
+                            {t('Complete')}
                           </Button>
                         )}
 
@@ -261,7 +260,7 @@ export default function StaffDashboardPage() {
                             size="sm"
                             onClick={() => handleStatusChange(apt.id, 'cancelled')}
                             className="rounded-[6px] text-error hover:bg-error/10 text-xs h-7 px-2"
-                            title="Cancel appointment"
+                            title={t('Cancel')}
                           >
                             <XCircle className="h-3.5 w-3.5" />
                           </Button>
@@ -269,7 +268,7 @@ export default function StaffDashboardPage() {
 
                         <Link href={`/staff/patients/${apt.patient_id}`}>
                           <Button variant="ghost" size="sm" className="rounded-[6px] text-xs h-7 px-2.5 text-textSecondary hover:text-textPrimary">
-                            Chart
+                            {t('Open Chart')}
                           </Button>
                         </Link>
                       </div>
