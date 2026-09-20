@@ -103,9 +103,9 @@ export default function LoginPage() {
                   Create an account
                 </Link>
               </p>
-              <p className="text-[12px] text-[#9C9C9C]">
+              <p className="text-[12px] text-[#6B6B6B]">
                 Staff member?{' '}
-                <Link href="/staff-portal" className="text-[#6B6B6B] hover:text-[#0A0A0A] underline">
+                <Link href="/staff-portal" className="text-[#0671B8] hover:underline font-medium">
                   Staff sign in
                 </Link>
               </p>

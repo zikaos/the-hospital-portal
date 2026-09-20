@@ -60,7 +60,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="px-3 py-5 space-y-4">
           <div className="px-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9C9C9C]">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-[#6B6B6B]">
               {isStaff ? 'Staff Workspace' : 'Menu'}
             </p>
           </div>
@@ -82,7 +82,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                       : 'text-[#6B6B6B] hover:bg-[#F4F4F6] hover:text-[#0A0A0A]'
                   )}
                 >
-                  <Icon className={cn('h-4 w-4 flex-shrink-0', isActive ? 'text-white' : 'text-[#9C9C9C] group-hover:text-[#0A0A0A]')} />
+                  <Icon className={cn('h-4 w-4 flex-shrink-0', isActive ? 'text-white' : 'text-[#6B6B6B] group-hover:text-[#0A0A0A]')} />
                   <span>{item.name}</span>
                 </Link>
               );
@@ -92,7 +92,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Quiet clinical note */}
         <div className="p-3 border-t border-[#E8E8EC] m-3 text-center">
-          <p className="text-[11px] text-[#9C9C9C]">
+          <p className="text-[11px] text-[#6B6B6B]">
             The Hospital Portal
           </p>
         </div>
