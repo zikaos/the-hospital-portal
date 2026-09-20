@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Hospital Portal — User & Patient Guide</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1a202c;
+      background-color: #ffffff;
+      line-height: 1.55;
+      font-size: 13.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+    
+    /* Cover / Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #0671B8 0%, #005691 60%, #00A8A7 100%);
+      color: #ffffff;
+      padding: 36px 32px;
+      border-radius: 12px;
+      margin-bottom: 28px;
+    }
+    .brand-tag {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+    }
+    .header-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+    .header-subtitle {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 400;
+      max-width: 600px;
+    }
+    .doc-meta {
+      display: flex;
+      gap: 20px;
+      margin-top: 18px;
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.8);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      padding-top: 12px;
+    }
+
+    /* Typography */
+    h2 {
+      font-size: 19px;
+      font-weight: 700;
+      color: #0671B8;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 6px;
+    }
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0A0A0A;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    p {
+      color: #4A5568;
+      margin-bottom: 10px;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .card-accent {
+      border-left: 4px solid #0671B8;
+    }
+    .card-teal {
+      border-left: 4px solid #00A8A7;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-bottom: 6px;
+    }
+
+    /* Step flow */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .step-item {
+      display: flex;
+      gap: 14px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: #0671B8;
+      color: #ffffff;
+      font-weight: 700;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0A0A0A;
+      margin-bottom: 3px;
+    }
+    .step-content p {
+      margin-bottom: 0;
+      font-size: 12.5px;
+    }
+
+    /* Callout & Highlights */
+    .callout {
+      background-color: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 14px 0;
+      display: flex;
+      gap: 12px;
+    }
+    .callout-icon {
+      color: #0671B8;
+      font-weight: bold;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .callout-body {
+      font-size: 12.5px;
+      color: #1E3A8A;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12.5px;
+    }
+    th {
+      background-color: #F1F5F9;
+      color: #0A0A0A;
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+      border: 1px solid #E2E8F0;
+    }
+    td {
+      padding: 9px 12px;
+      border: 1px solid #E2E8F0;
+      color: #4A5568;
+    }
+    tr:nth-child(even) td {
+      background-color: #F8FAFC;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+    .badge-blue { background-color: #E0F2FE; color: #0369A1; }
+    .badge-green { background-color: #DCFCE7; color: #15803D; }
+    .badge-amber { background-color: #FEF3C7; color: #B45309; }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: 24px;
+      padding-top: 12px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #6B6B6B;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cover / Hero Section -->
+  <div class="header-banner">
+    <span class="brand-tag">Patient & Caregiver Documentation</span>
+    <h1 class="header-title">The Hospital Portal</h1>
+    <p class="header-subtitle">Your complete, secure healthcare companion. Book clinical visits, access diagnostic reports, and manage active prescriptions from any device.</p>
+    <div class="doc-meta">
+      <div><strong>Document:</strong> Non-Technical User Guide</div>
+      <div><strong>Version:</strong> 1.0 (Production)</div>
+      <div><strong>Classification:</strong> Public / Patient Reference</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Overview -->
+  <h2>1. Welcome to The Hospital Portal</h2>
+  <p>
+    <strong>The Hospital Portal</strong> is designed to make managing your medical care clear, comfortable, and accessible. You can schedule doctor appointments, check lab findings, review active medications, and manage personal emergency contacts without waiting on phone queues or navigating complicated menus.
+  </p>
+
+  <div class="grid-2">
+    <div class="card card-accent">
+      <div class="card-title">Clear Clinical Communication</div>
+      <p>Every diagnosis, medication instruction, and appointment status is written in plain, human language so you always understand your care plan.</p>
+    </div>
+    <div class="card card-teal">
+      <div class="card-title">Bank-Grade Privacy & Protection</div>
+      <p>Your records and personal details are encrypted and isolated so that only you and your verified healthcare team have access.</p>
+    </div>
+  </div>
+
+  <!-- Section 2: Key Features -->
+  <h2>2. Key Features at a Glance</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📅 24/7 Appointment Scheduling</div>
+      <p>Browse available doctors, view specialties (Cardiology, Pediatrics, General Practice), select your preferred time slot, and track confirmed or upcoming visits.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🧪 Diagnostic Records & Lab Results</div>
+      <p>Instant access to complete blood counts, imaging summaries, consultation notes, and doctor recommendations as soon as they are finalized.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">💊 Medication & Prescription Tracking</div>
+      <p>Keep a clear list of what medications you take, exact dosages, meal timings, prescribing physicians, and remaining refill quantities.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">🛡️ Health Profile & Emergency Care</div>
+      <p>Maintain your date of birth, insurance carrier number, known allergies, blood type, and emergency contacts in one secure location.</p>
+    </div>
+  </div>
+
+  <div class="callout avoid-break">
+    <div class="callout-icon">ℹ️</div>
+    <div class="callout-body">
+      <strong>Peace of Mind Guarantee:</strong> The Hospital Portal is fully responsive and functions seamlessly on mobile phones, tablets, and desktop computers. No app store installation is required—simply open your web browser.
+    </div>
+  </div>
+
+  <!-- Page Break for Clean Layout -->
+  <div class="page-break"></div>
+
+  <!-- Section 3: Patient Step-by-Step Journey -->
+  <h2>3. Step-by-Step Patient Walkthrough</h2>
+
+  <div class="step-list">
+    <div class="step-item avoid-break">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Creating Your Patient Account</h4>
+        <p>Visit the portal homepage and click <strong>"Create Patient Account"</strong>. Enter your full name, email address, and a secure password. Your account is immediately created and initialized with full patient privacy protections.</p>
+      </div>
+    </div>
+
+    <div class="step-item avoid-break">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Accessing Your Patient Dashboard</h4>
+        <p>Once logged in, your personal dashboard displays your next upcoming appointment, any unread doctor notifications, active prescriptions, and recent lab results in clean, easy-to-read summary cards.</p>
+      </div>
+    </div>
+
+    <div class="step-item avoid-break">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Scheduling a New Appointment</h4>
+        <p>Navigate to <strong>Appointments</strong> &rarr; <strong>"Book Appointment"</strong>. Choose your attending physician, select date and time, and type the reason for your visit (e.g. <em>"Routine blood pressure check"</em>). You'll receive instant confirmation.</p>
+      </div>
+    </div>
+
+    <div class="step-item avoid-break">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Reviewing Diagnostic Reports</h4>
+        <p>Under <strong>Medical Records</strong>, view past lab results, physical exams, and specialist consultations. Each record displays the date, doctor’s findings, and clear follow-up advice.</p>
+      </div>
+    </div>
+
+    <div class="step-item avoid-break">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>Tracking Medications & Prescriptions</h4>
+        <p>Open <strong>Prescriptions</strong> to check exact directions (e.g. <em>"Take 1 tablet every morning with water"</em>), refill dates, and doctor contact information.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: For Clinical & Administrative Staff -->
+  <h2>4. For Hospital & Clinical Staff</h2>
+  <p>
+    Clinical staff and physicians access patient care records through the <strong>Dedicated Staff Portal</strong>. To ensure patient safety, staff access is strictly separated from patient self-service.
+  </p>
+
+  <table class="avoid-break">
+    <thead>
+      <tr>
+        <th>Workflow</th>
+        <th>Description</th>
+        <th>Staff Role Required</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Staff Verification</strong></td>
+        <td>Secure clinical badge entry requiring hospital-issued passcode authentication before clinical login.</td>
+        <td><span class="badge badge-blue">Clinical Passcode</span></td>
+      </tr>
+      <tr>
+        <td><strong>Patient Directory</strong></td>
+        <td>Search registered patients by name or ID, review appointment attendance, and access medical history.</td>
+        <td><span class="badge badge-green">Doctor / Nurse</span></td>
+      </tr>
+      <tr>
+        <td><strong>Schedule Management</strong></td>
+        <td>Confirm appointment bookings, update visit status to <em>Completed</em>, and write visit consultation summaries.</td>
+        <td><span class="badge badge-green">Doctor / Reception</span></td>
+      </tr>
+      <tr>
+        <td><strong>Clinical Records</strong></td>
+        <td>Upload diagnostic test results, add treatment notes, and issue authorized digital prescriptions.</td>
+        <td><span class="badge badge-amber">Attending Physician</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 5: Frequently Asked Questions -->
+  <h2>5. Frequently Asked Questions (FAQ)</h2>
+
+  <div class="card avoid-break" style="margin-bottom: 12px;">
+    <div class="card-title">Can other patients see my medical records?</div>
+    <p style="margin-bottom: 0;">No. The portal uses Row Level Security (RLS). Your records are encrypted and tied strictly to your personal login. No other patient can see or search for your information.</p>
+  </div>
+
+  <div class="card avoid-break" style="margin-bottom: 12px;">
+    <div class="card-title">Can anyone register as a doctor or nurse?</div>
+    <p style="margin-bottom: 0;">No. Public registration is locked strictly to patients. Clinical staff accounts must be provisioned through verified hospital channels with clinical security authorization.</p>
+  </div>
+
+  <div class="card avoid-break">
+    <div class="card-title">What should I do in an emergency?</div>
+    <p style="margin-bottom: 0;">The Hospital Portal is designed for routine appointments, records, and prescriptions. If you are experiencing a medical emergency, please call <strong>911</strong> or visit your nearest hospital emergency department immediately.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <span>The Hospital Portal &bull; Patient Care Systems</span>
+    <span>Support: support@hospitalportal.local &bull; Page 1 of 2</span>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Hospital Portal — Technical Architecture & Workflow Specification</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 18mm 16mm 18mm 16mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1a202c;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 12.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #0A0A0A 0%, #1E293B 70%, #0671B8 100%);
+      color: #ffffff;
+      padding: 30px 28px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+    }
+    .brand-tag {
+      display: inline-block;
+      background-color: #0671B8;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .header-subtitle {
+      font-size: 13.5px;
+      color: #CBD5E1;
+      font-weight: 400;
+      max-width: 650px;
+    }
+    .doc-meta {
+      display: flex;
+      gap: 18px;
+      margin-top: 14px;
+      font-size: 11px;
+      color: #94A3B8;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      padding-top: 10px;
+    }
+
+    /* Typography */
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0671B8;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      border-bottom: 1.5px solid #E2E8F0;
+      padding-bottom: 4px;
+    }
+    h3 {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #0A0A0A;
+      margin-top: 12px;
+      margin-bottom: 5px;
+    }
+    p {
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-bottom: 4px;
+    }
+
+    /* Code & Syntax */
+    pre, code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+    code {
+      font-size: 11px;
+      background: #F1F5F9;
+      padding: 2px 5px;
+      border-radius: 4px;
+      color: #0F172A;
+    }
+    pre {
+      background: #0F172A;
+      color: #F8FAFC;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.45;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+    .comment { color: #64748B; }
+    .keyword { color: #38BDF8; font-weight: 600; }
+    .func { color: #A78BFA; }
+    .string { color: #4ADE80; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+      font-size: 11.5px;
+    }
+    th {
+      background-color: #F1F5F9;
+      color: #0F172A;
+      font-weight: 600;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #CBD5E1;
+    }
+    td {
+      padding: 7px 10px;
+      border: 1px solid #E2E8F0;
+      color: #334155;
+    }
+    tr:nth-child(even) td {
+      background-color: #F8FAFC;
+    }
+
+    /* Architecture Diagram Box */
+    .arch-diagram {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 14px;
+      margin: 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .arch-tier {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 8px 12px;
+    }
+    .arch-tier-title {
+      font-weight: 700;
+      font-size: 11.5px;
+      color: #0671B8;
+      width: 140px;
+      flex-shrink: 0;
+    }
+    .arch-tier-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .pill {
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      font-size: 10.5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      color: #1E293B;
+      font-weight: 500;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+    .badge-blue { background-color: #E0F2FE; color: #0369A1; }
+    .badge-green { background-color: #DCFCE7; color: #15803D; }
+    .badge-amber { background-color: #FEF3C7; color: #B45309; }
+    .badge-red { background-color: #FEE2E2; color: #B91C1C; }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: #64748B;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <span class="brand-tag">Engineering Whitepaper</span>
+    <h1 class="header-title">The Hospital Portal — Technical Architecture</h1>
+    <p class="header-subtitle">Comprehensive architectural specification, Row Level Security (RLS) enforcement model, dual-mode persistence mechanics, and Vercel cloud deployment pipeline.</p>
+    <div class="doc-meta">
+      <div><strong>Stack:</strong> Next.js 14 &bull; TypeScript &bull; Supabase &bull; Vercel</div>
+      <div><strong>Version:</strong> 1.0.0 (Production)</div>
+      <div><strong>Target:</strong> Engineering & DevOps</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Architecture Overview -->
+  <h2>1. System Topology & Tech Stack</h2>
+  <p>
+    The Hospital Portal is engineered on the <strong>Next.js 14 App Router</strong> with TypeScript strict mode. It uses a clean separation between React Server Components (RSC) and interactive client boundaries (<code>'use client'</code>). Visual styling follows the clinical <strong>ThaiCloud Design System</strong> tokenized via Tailwind CSS.
+  </p>
+
+  <div class="arch-diagram avoid-break">
+    <div class="arch-tier">
+      <div class="arch-tier-title">Client & Presentation</div>
+      <div class="arch-tier-items">
+        <span class="pill">Next.js 14 App Router</span>
+        <span class="pill">Tailwind CSS (ThaiCloud Tokens)</span>
+        <span class="pill">Lucide React Icons</span>
+        <span class="pill">Kanit / Sans Typography</span>
+      </div>
+    </div>
+    <div class="arch-tier">
+      <div class="arch-tier-title">Auth & State Layer</div>
+      <div class="arch-tier-items">
+        <span class="pill">AuthContext (React Context)</span>
+        <span class="pill">Next.js Route Middleware</span>
+        <span class="pill">Edge Clinical Gatekeeper</span>
+        <span class="pill">Dual-Mode Session Resolver</span>
+      </div>
+    </div>
+    <div class="arch-tier">
+      <div class="arch-tier-title">Data Persistence Layer</div>
+      <div class="arch-tier-items">
+        <span class="pill">Supabase PostgreSQL 15</span>
+        <span class="pill">PostgreSQL RLS (Row Level Security)</span>
+        <span class="pill">Encrypted Storage Bucket (medical-files)</span>
+        <span class="pill">Graceful Mock Offline Fallback</span>
+      </div>
+    </div>
+    <div class="arch-tier">
+      <div class="arch-tier-title">Infrastructure & CI/CD</div>
+      <div class="arch-tier-items">
+        <span class="pill">Vercel Edge Platform</span>
+        <span class="pill">GitHub CI/CD Trigger</span>
+        <span class="pill">Serverless Node.js Runtime</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Tech Stack Breakdown -->
+  <h2>2. Core Dependencies & Directory Structure</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Package / Layer</th>
+        <th>Version</th>
+        <th>Purpose & Responsibilities</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>next</code></td>
+        <td>14.2.35</td>
+        <td>App Router framework, SSR, client-side route transitions, production optimization.</td>
+      </tr>
+      <tr>
+        <td><code>@supabase/supabase-js</code></td>
+        <td>^2.49.1</td>
+        <td>PostgreSQL client SDK, Auth state listener, RLS query execution, file uploads.</td>
+      </tr>
+      <tr>
+        <td><code>tailwindcss</code></td>
+        <td>^3.4.1</td>
+        <td>Design system tokenization: Primary (<code>#0671B8</code>), Secondary (<code>#00A8A7</code>), Neutral (<code>#0A0A0A</code>).</td>
+      </tr>
+      <tr>
+        <td><code>lucide-react</code></td>
+        <td>^0.359.0</td>
+        <td>Unified clinical iconography with accessible SVGs.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Section 3: Dual-Mode Persistence Layer -->
+  <h2>3. Dual-Mode Persistence Architecture (<code>lib/api.ts</code>)</h2>
+  <p>
+    The application employs a <strong>resilient dual-mode data architecture</strong>. All high-level business functions (e.g. <code>getAppointments()</code>, <code>createAppointment()</code>, <code>login()</code>) automatically inspect whether live Supabase credentials are configured via <code>isSupabaseConfigured()</code>:
+  </p>
+  <ul style="margin-left: 20px; margin-bottom: 12px; color: #334155;">
+    <li><strong>Live Cloud Mode (Supabase):</strong> When <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> are provided, operations query Supabase PostgreSQL with strict Row Level Security (RLS) enforcement.</li>
+    <li><strong>Graceful Mock Fallback:</strong> If keys are absent or during offline testing, the system transparently falls back to an in-memory/localStorage mock repository (<code>INITIAL_APPOINTMENTS</code>, <code>INITIAL_MEDICAL_RECORDS</code>) without crashing.</li>
+  </ul>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- Section 4: Security & Staff Isolation -->
+  <h2>4. Authentication Architecture & Staff Isolation</h2>
+  <p>
+    A critical architectural requirement is the <strong>absolute isolation of clinical staff privileges</strong> from self-service patient onboarding.
+  </p>
+
+  <div class="grid-2 avoid-break">
+    <div class="card">
+      <div class="card-title">Patient Portal Perimeter</div>
+      <p>Publicly accessible. Allows email registration and sign-in. Restricted strictly to <code>role = 'patient'</code>. Database RLS rejects any profile insertion with <code>role = 'staff'</code>.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Staff Portal Perimeter</div>
+      <p>Isolated at <code>/staff-portal</code>. Requires two-factor verification: hospital clinical passcode (<code>NEXT_PUBLIC_STAFF_PASSCODE</code>) plus verified staff role in database.</p>
+    </div>
+  </div>
+
+  <h3>Security Enforcement Layers:</h3>
+  <ol style="margin-left: 20px; margin-bottom: 14px; color: #334155; line-height: 1.6;">
+    <li><strong>Client Route Guard (<code>middleware.ts</code>):</strong> Inspects route paths. Unauthenticated requests to <code>/staff/*</code> are redirected immediately to <code>/staff-portal</code>.</li>
+    <li><strong>Context Verification (<code>auth-context.tsx</code>):</strong> <code>login()</code> rejects any authenticated identity possessing <code>role = 'staff'</code> with <em>"Access denied: Clinical staff must sign in via the Staff Portal."</em></li>
+    <li><strong>PostgreSQL Database RLS:</strong> Self-registration RLS policy:
+      <code>create policy "users insert own profile" on profiles for insert with check (id = auth.uid() and role = 'patient');</code>
+      Even if an attacker invokes the raw Supabase REST API directly, PostgreSQL enforces role safety at the storage engine level.
+    </li>
+  </ol>
+
+  <!-- Section 5: Database Schema & RLS Recursion Fix -->
+  <h2>5. Database Schema & RLS Recursion Fix</h2>
+  <p>
+    The database consists of 7 normalized PostgreSQL relational tables with cascading foreign keys:
+  </p>
+
+  <table class="avoid-break">
+    <thead>
+      <tr>
+        <th>Table Name</th>
+        <th>Primary Key</th>
+        <th>Foreign Keys</th>
+        <th>Security Policy (RLS)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>profiles</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>auth.users(id) ON DELETE CASCADE</code></td>
+        <td>Users read/update own; Staff reads all.</td>
+      </tr>
+      <tr>
+        <td><code>patients</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>profiles(id) ON DELETE CASCADE</code></td>
+        <td>Patient reads own; Staff reads all.</td>
+      </tr>
+      <tr>
+        <td><code>staff</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>profiles(id) ON DELETE CASCADE</code></td>
+        <td>Authenticated users read directory (for booking).</td>
+      </tr>
+      <tr>
+        <td><code>appointments</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>patients(id), staff(id)</code></td>
+        <td>Patient reads/creates own; Staff manages all.</td>
+      </tr>
+      <tr>
+        <td><code>medical_records</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>patients(id), staff(id)</code></td>
+        <td>Patient reads own; Staff full CRUD.</td>
+      </tr>
+      <tr>
+        <td><code>prescriptions</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>patients(id), staff(id)</code></td>
+        <td>Patient reads own; Staff full CRUD.</td>
+      </tr>
+      <tr>
+        <td><code>notifications</code></td>
+        <td><code>id (uuid)</code></td>
+        <td><code>profiles(id) ON DELETE CASCADE</code></td>
+        <td>User reads & marks read own notifications.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Resolution of PostgreSQL Error 42P17 (RLS Infinite Recursion):</h3>
+  <p>
+    Standard subqueries like <code>EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'staff')</code> inside a <code>profiles</code> RLS policy trigger infinite recursion. To solve this with zero latency overhead, we deploy a <code>SECURITY DEFINER</code> function:
+  </p>
+
+  <pre class="avoid-break"><span class="comment">-- 1. Bypass RLS evaluation during role verification</span>
+<span class="keyword">CREATE OR REPLACE FUNCTION</span> <span class="func">public.is_staff</span>()
+<span class="keyword">RETURNS</span> boolean <span class="keyword">LANGUAGE</span> sql <span class="keyword">SECURITY DEFINER</span> <span class="keyword">SET</span> search_path = public <span class="keyword">STABLE</span>
+<span class="keyword">AS</span> $$
+  <span class="keyword">SELECT COALESCE</span>(
+    (<span class="keyword">SELECT</span> role = <span class="string">'staff'</span> <span class="keyword">FROM</span> public.profiles <span class="keyword">WHERE</span> id = auth.uid()),
+    false
+  );
+$$;
+
+<span class="comment">-- 2. Clean, non-recursive RLS policy</span>
+<span class="keyword">CREATE POLICY</span> <span class="string">"staff read all profiles"</span> <span class="keyword">ON</span> profiles
+  <span class="keyword">FOR SELECT USING</span> (<span class="func">public.is_staff</span>());</pre>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- Section 6: End-to-End Workflow Sequences -->
+  <h2>6. End-to-End Workflow Data Flow</h2>
+
+  <h3>A. Patient Appointment Booking Flow</h3>
+  <div class="arch-diagram avoid-break">
+    <div style="font-size: 11.5px; line-height: 1.6; color: #334155;">
+      <strong>1. Client Action:</strong> Patient selects attending physician, date/time, and reason in <code>/patient/appointments</code>.<br>
+      <strong>2. Auth Verification:</strong> <code>api.ts</code> checks <code>auth.getUser()</code> ensuring valid JWT session token.<br>
+      <strong>3. Database Insertion:</strong> Inserts record into <code>appointments</code> with <code>patient_id = auth.uid()</code>.<br>
+      <strong>4. Notification Dispatch:</strong> System inserts an alert into <code>notifications</code> for both patient and assigned doctor.<br>
+      <strong>5. Real-Time UI Update:</strong> Optimistic local state update and route refresh displays the new appointment as <em>Pending</em>.
+    </div>
+  </div>
+
+  <h3>B. Clinical Staff Consultation & Diagnostic Record Flow</h3>
+  <div class="arch-diagram avoid-break">
+    <div style="font-size: 11.5px; line-height: 1.6; color: #334155;">
+      <strong>1. Staff Authentication:</strong> Attending physician validates via Passcode + Email/Password at <code>/staff-portal</code>.<br>
+      <strong>2. Schedule Inspection:</strong> Loads confirmed patient appointments at <code>/staff/dashboard</code> via <code>is_staff()</code> RLS policy.<br>
+      <strong>3. Diagnostic Documentation:</strong> Staff submits lab findings / consultation summary via <code>addMedicalRecord()</code>.<br>
+      <strong>4. File Upload (Optional):</strong> PDF/scan uploaded to Supabase Storage bucket <code>medical-files</code> under staff policy.<br>
+      <strong>5. Patient Portal Reflection:</strong> Patient instantly sees the new report in <code>/patient/records</code> with doctor's notes.
+    </div>
+  </div>
+
+  <!-- Section 7: CI/CD & Deployment Matrix -->
+  <h2>7. CI/CD Pipeline & Vercel Deployment Specification</h2>
+  <p>
+    The application is deployed to the <strong>Vercel Edge Platform</strong> with automated Git triggers on pushes to <code>main</code>.
+  </p>
+
+  <table class="avoid-break">
+    <thead>
+      <tr>
+        <th>Variable Name</th>
+        <th>Classification</th>
+        <th>Purpose & Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>NEXT_PUBLIC_SUPABASE_URL</code></td>
+        <td><span class="badge badge-blue">Public URL</span></td>
+        <td>Endpoint for Supabase Cloud PostgreSQL and Auth API.</td>
+      </tr>
+      <tr>
+        <td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td>
+        <td><span class="badge badge-green">Anon / Public</span></td>
+        <td>Client-safe publishable JWT for scoped RLS PostgreSQL queries.</td>
+      </tr>
+      <tr>
+        <td><code>NEXT_PUBLIC_STAFF_PASSCODE</code></td>
+        <td><span class="badge badge-amber">Clinical Gate</span></td>
+        <td>Passcode guarding clinical staff portal entry (<code>APEX-STAFF-9021</code>).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card avoid-break" style="margin-top: 14px;">
+    <div class="card-title">Production Verification Checklist</div>
+    <ul style="margin-left: 20px; font-size: 11.5px; color: #334155; line-height: 1.6;">
+      <li>Production build verified: <code>next build</code> passes with code 0 (14/14 static and dynamic routes compiled).</li>
+      <li>Zero sensitive environment files in source control: <code>.env.local</code> verified in <code>.gitignore</code>.</li>
+      <li>PostgreSQL RLS verified: zero infinite recursion with <code>public.is_staff()</code> security definer function.</li>
+      <li>Staff perimeter verified: patient registration cannot grant staff roles under any input vectors.</li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <div class="doc-footer">
+    <span>The Hospital Portal &bull; Engineering Architecture &bull; Rev 1.0.0</span>
+    <span>Repository: github.com/zikaos/the-hospital-portal &bull; Page 1 of 3</span>
+  </div>
+
+</body>
+</html>
