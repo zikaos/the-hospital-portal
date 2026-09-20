@@ -1,51 +1,22 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+export const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 
-export function formatDate(dateString: string | null | undefined): string {
-  if (!dateString) return "N/A";
+const format = (str: string | null | undefined, options: Intl.DateTimeFormatOptions): string => {
+  if (!str) return "N/A";
   try {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(date);
+    return new Intl.DateTimeFormat("en-US", options).format(new Date(str));
   } catch {
-    return dateString;
+    return str;
   }
-}
+};
 
-export function formatDateTime(dateTimeString: string | null | undefined): string {
-  if (!dateTimeString) return "N/A";
-  try {
-    const date = new Date(dateTimeString);
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  } catch {
-    return dateTimeString;
-  }
-}
+export const formatDate = (s: string | null | undefined) =>
+  format(s, { month: "short", day: "numeric", year: "numeric" });
 
-export function formatTime(dateTimeString: string | null | undefined): string {
-  if (!dateTimeString) return "N/A";
-  try {
-    const date = new Date(dateTimeString);
-    return new Intl.DateTimeFormat("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    }).format(date);
-  } catch {
-    return dateTimeString;
-  }
-}
+export const formatDateTime = (s: string | null | undefined) =>
+  format(s, { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true });
+
+export const formatTime = (s: string | null | undefined) =>
+  format(s, { hour: "numeric", minute: "2-digit", hour12: true });
