@@ -33,3 +33,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agent harnesses and binaries
+.agent/
+.claude/
+.gemini/
+.opencode/
