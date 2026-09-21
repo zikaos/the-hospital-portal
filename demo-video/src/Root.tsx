@@ -3,12 +3,22 @@ import { Composition } from "remotion";
 import { HelloWorld } from "./HelloWorld";
 import { Logo } from "./HelloWorld/Logo";
 import { HospitalPortalDemo } from "./HospitalPortalDemo";
+import { LiveWalkthrough } from "./LiveWalkthrough";
 
 // Each <Composition> is an entry in the sidebar!
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="LiveWalkthrough"
+        component={LiveWalkthrough}
+        durationInFrames={1150}
+        fps={25}
+        width={1440}
+        height={900}
+      />
+
       <Composition
         id="HospitalPortalDemo"
         component={HospitalPortalDemo}
