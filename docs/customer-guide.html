@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Hospital Portal — Customer & User Guide</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 16mm 14mm 16mm 14mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #1a202c;
+      background-color: #ffffff;
+      line-height: 1.5;
+      font-size: 13px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+    }
+
+    /* Cover / Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #0671B8 0%, #005691 55%, #00A8A7 100%);
+      color: #ffffff;
+      padding: 30px 28px;
+      border-radius: 10px;
+      margin-bottom: 22px;
+    }
+    .brand-tag {
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      margin-bottom: 10px;
+    }
+    .header-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .header-subtitle {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 400;
+      max-width: 650px;
+    }
+    .doc-meta {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.85);
+      border-top: 1px solid rgba(255, 255, 255, 0.25);
+      padding-top: 10px;
+    }
+
+    /* Typography */
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0671B8;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 5px;
+    }
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0A0A0A;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+    p {
+      color: #4A5568;
+      margin-bottom: 8px;
+    }
+    ul, ol {
+      margin-left: 18px;
+      margin-bottom: 10px;
+      color: #4A5568;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+
+    /* Cards & Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .card-accent {
+      border-left: 4px solid #0671B8;
+    }
+    .card-teal {
+      border-left: 4px solid #00A8A7;
+    }
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-bottom: 6px;
+    }
+
+    /* Credential box */
+    .cred-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed #E2E8F0;
+      font-size: 12px;
+    }
+    .cred-row:last-child {
+      border-bottom: none;
+    }
+    .cred-label {
+      color: #64748B;
+      font-weight: 500;
+    }
+    .cred-val {
+      color: #0A0A0A;
+      font-family: Consolas, Monaco, monospace;
+      font-weight: 600;
+      background: #EDF2F7;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    /* Callout & Highlights */
+    .callout {
+      background-color: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin: 12px 0;
+      display: flex;
+      gap: 10px;
+    }
+    .callout-icon {
+      color: #0671B8;
+      font-weight: bold;
+      font-size: 16px;
+      line-height: 1;
+    }
+    .callout-body {
+      font-size: 12px;
+      color: #1E3A8A;
+      line-height: 1.45;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 12px;
+    }
+    th {
+      background-color: #F1F5F9;
+      color: #0A0A0A;
+      font-weight: 600;
+      text-align: left;
+      padding: 8px 10px;
+      border: 1px solid #E2E8F0;
+    }
+    td {
+      padding: 7px 10px;
+      border: 1px solid #E2E8F0;
+      color: #4A5568;
+    }
+    tr:nth-child(even) td {
+      background-color: #F8FAFC;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 9999px;
+    }
+    .badge-blue { background-color: #E0F2FE; color: #0369A1; }
+    .badge-teal { background-color: #CCFBF1; color: #0F766E; }
+    .badge-amber { background-color: #FEF3C7; color: #B45309; }
+
+    /* Footer */
+    .doc-footer {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 10.5px;
+      color: #6B6B6B;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Banner -->
+  <div class="header-banner">
+    <div class="brand-tag">The Hospital Portal • Customer Manual</div>
+    <div class="header-title">Customer & User Guide</div>
+    <div class="header-subtitle">
+      Complete reference on portal access, login credentials, language switching, and step-by-step patient and clinical staff workflows.
+    </div>
+    <div class="doc-meta">
+      <div><strong>Platform:</strong> Web Application</div>
+      <div><strong>Mode:</strong> Prototype Mode (Zero Email Verification)</div>
+      <div><strong>Languages:</strong> English &amp; العربية (Full RTL)</div>
+      <div><strong>Document:</strong> Version 1.0.0</div>
+    </div>
+  </div>
+
+  <!-- Section 1: Access & Credentials -->
+  <div class="avoid-break">
+    <h2>1. Portal Access &amp; Required Credentials</h2>
+    <p>
+      The portal is configured in instant prototype mode. Accounts activate immediately upon registration without email verification links or confirmation codes.
+    </p>
+
+    <div class="grid-2">
+      <!-- Patient Credentials Card -->
+      <div class="card card-accent">
+        <div class="card-title">Patient Portal Access</div>
+        <p style="font-size: 11.5px; margin-bottom: 8px;">For patients booking appointments, viewing lab reports, and tracking medications.</p>
+        <div class="cred-row">
+          <span class="cred-label">Login URL:</span>
+          <span class="cred-val">/login</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Registration:</span>
+          <span class="cred-val">/signup</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Demo Email:</span>
+          <span class="cred-val">sarah.chen@example.com</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Demo Password:</span>
+          <span class="cred-val">password123</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">One-Click Fill:</span>
+          <span style="font-size: 11px; color: #0671B8; font-weight: 600;">"Demo: Fill Sarah Chen credentials"</span>
+        </div>
+      </div>
+
+      <!-- Staff Credentials Card -->
+      <div class="card card-teal">
+        <div class="card-title">Staff Clinical Workspace</div>
+        <p style="font-size: 11.5px; margin-bottom: 8px;">Restricted clinical portal for doctors, nurses, and medical administrators.</p>
+        <div class="cred-row">
+          <span class="cred-label">Gateway URL:</span>
+          <span class="cred-val">/staff-portal</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Clinic Passcode:</span>
+          <span class="cred-val">APEX-STAFF-9021</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Demo Email:</span>
+          <span class="cred-val">dr.vance@clinic.demo</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">Demo Password:</span>
+          <span class="cred-val">password123</span>
+        </div>
+        <div class="cred-row">
+          <span class="cred-label">One-Click Fill:</span>
+          <span style="font-size: 11px; color: #00A8A7; font-weight: 600;">"Demo: Fill Dr. Marcus Vance credentials"</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-icon">i</div>
+      <div class="callout-body">
+        <strong>Security Notice:</strong> The public site (<code>/login</code>, <code>/signup</code>) only permits patient accounts. Clinical staff accounts must sign in via the dedicated <code>/staff-portal</code> gateway and require the clinic security passcode (<code>APEX-STAFF-9021</code>).
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Language & Layout Switching -->
+  <div class="avoid-break">
+    <h2>2. Language &amp; Layout Switching</h2>
+    <p>
+      The portal features a zero-reload language toggle in the top-right corner of the navigation bar on every page.
+    </p>
+    <ul>
+      <li><strong>Switch Button:</strong> Labeled <code>العربية</code> when in English mode, and <code>English</code> when in Arabic mode.</li>
+      <li><strong>Instant Toggle:</strong> Updates all text, headers, table columns, badges, and modals immediately without refreshing the page.</li>
+      <li><strong>Right-to-Left (RTL) Typography:</strong> Switching to Arabic activates full right-to-left layout alignment and renders typography using the Google Cairo font.</li>
+      <li><strong>Session Persistence:</strong> Your language choice is saved in your browser storage and persists across visits.</li>
+    </ul>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- Section 3: Patient Portal Walkthrough -->
+  <div class="avoid-break">
+    <h2>3. Patient Portal Walkthrough</h2>
+
+    <h3>1. Dashboard (<code>/patient/dashboard</code>)</h3>
+    <p>The main overview screen displays your next confirmed doctor visit, your active medication list, and recent notifications from your care team.</p>
+
+    <h3>2. Booking an Appointment (<code>/patient/appointments</code>)</h3>
+    <ol>
+      <li>Click <strong>"Book appointment"</strong> in the top navigation or on the appointments page.</li>
+      <li>Choose your attending doctor from the physician directory.</li>
+      <li>Select your preferred consultation date and time.</li>
+      <li>Type your consultation reason (e.g. <em>"Routine blood pressure follow-up"</em>).</li>
+      <li>Click <strong>"Confirm Booking"</strong>. The appointment status displays as <strong>Pending</strong> until confirmed by clinic staff.</li>
+    </ol>
+
+    <h3>3. Electronic Medical Records (<code>/patient/records</code>)</h3>
+    <ol>
+      <li>Click <strong>"Medical Records"</strong> in the sidebar.</li>
+      <li>Filter by category: <strong>Lab Results</strong>, <strong>Visit Summaries</strong>, or <strong>Diagnoses</strong>.</li>
+      <li>Review findings, clinical notes, and attending doctor remarks.</li>
+      <li>Click <strong>"Export as Text"</strong> to download a formatted clinical document.</li>
+    </ol>
+
+    <h3>4. Prescriptions &amp; Medications (<code>/patient/prescriptions</code>)</h3>
+    <ol>
+      <li>Click <strong>"Prescriptions"</strong> in the sidebar.</li>
+      <li>Toggle between <strong>Active Prescriptions</strong> and <strong>Past Medications</strong>.</li>
+      <li>Check exact dosage (e.g. <em>10mg tablet</em>), dosing frequency (e.g. <em>Once daily with meals</em>), treatment dates, and doctor instructions.</li>
+    </ol>
+
+    <h3>5. Personal Profile &amp; Emergency Contacts (<code>/patient/profile</code>)</h3>
+    <p>Keep your contact telephone, home address, medical insurance carrier ID, and emergency contact details updated. Changes save immediately to your record.</p>
+  </div>
+
+  <!-- Section 4: Staff Workspace Walkthrough -->
+  <div class="avoid-break">
+    <h2>4. Staff Clinical Workspace Walkthrough</h2>
+
+    <h3>1. Today's Clinical Queue (<code>/staff/dashboard</code>)</h3>
+    <p>Real-time triage queue for all visits scheduled for the current day. Clinicians can manage appointments with one click:</p>
+    <ul>
+      <li><strong>Confirm:</strong> Validates and confirms pending patient appointment requests.</li>
+      <li><strong>Complete:</strong> Marks completed consultations.</li>
+      <li><strong>Cancel:</strong> Cancels appointment slots.</li>
+      <li><strong>Open Patient Chart:</strong> Opens the patient's electronic health record directly from any appointment row.</li>
+    </ul>
+
+    <h3>2. Patient Directory (<code>/staff/patients</code>)</h3>
+    <p>Searchable register across all enrolled patients. Filter by patient name, email, or telephone number to view demographics and open patient charts.</p>
+
+    <h3>3. Electronic Health Chart (<code>/staff/patients/[id]</code>)</h3>
+    <ul>
+      <li><strong>Demographics Card:</strong> Contact details, date of birth, insurance carrier, policy ID, emergency contacts, and home address.</li>
+      <li><strong>Add Medical Record:</strong> Click <strong>"Add record"</strong> to author lab reports, visit summaries, or diagnostic findings. Supports attaching documents (PDF, PNG, JPG).</li>
+      <li><strong>Issue Prescription:</strong> Click <strong>"Add prescription"</strong> to enter medication name, dosage, daily frequency, start/end dates, and pharmacy instructions.</li>
+      <li><strong>Appointment History:</strong> View full consultation history and update statuses directly.</li>
+    </ul>
+  </div>
+
+  <!-- Section 5: Quick Reference Matrix -->
+  <div class="avoid-break">
+    <h2>5. Quick Reference Matrix</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Sign-In URL</th>
+          <th>Credentials</th>
+          <th>Allowed Capabilities</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-blue">Patient</span></td>
+          <td><code>/login</code></td>
+          <td><code>sarah.chen@example.com</code><br>Password: <code>password123</code></td>
+          <td>Book consultations, view diagnostic lab reports, check prescription regimens, manage profile</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-blue">New Patient</span></td>
+          <td><code>/signup</code></td>
+          <td>Full Name, Email, Password</td>
+          <td>Self-register an instant patient account</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">Staff Doctor</span></td>
+          <td><code>/staff-portal</code></td>
+          <td><code>dr.vance@clinic.demo</code><br>Password: <code>password123</code><br>Passcode: <code>APEX-STAFF-9021</code></td>
+          <td>Triage daily queue, search patient directory, author medical records, issue electronic prescriptions</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">New Staff</span></td>
+          <td><code>/staff-portal</code> &rarr; Register</td>
+          <td>Name, Title, Specialty, Email, Password<br>Passcode: <code>APEX-STAFF-9021</code></td>
+          <td>Provision an authenticated medical staff member</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="doc-footer">
+      <div>The Hospital Portal • Customer Manual • Version 1.0.0</div>
+      <div>Confidential &bull; Authorized Medical &amp; Patient Portal Usage Only</div>
+    </div>
+  </div>
+
+</body>
+</html>

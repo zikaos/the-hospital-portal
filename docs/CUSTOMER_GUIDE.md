@@ -2,6 +2,8 @@
 
 This guide explains how to access the portal, which credentials to use, and how to navigate both the Patient and Staff workspaces.
 
+> **PDF Download:** [The_Hospital_Portal_Customer_Guide.pdf](./The_Hospital_Portal_Customer_Guide.pdf)
+
 ---
 
 ## 1. Access & Credentials

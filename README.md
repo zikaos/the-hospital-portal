@@ -5,6 +5,7 @@ A modern clinical **Hospital Portal** built with Next.js 14 (App Router), TypeSc
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 ### Documentation & Guides
+- **[Customer Portal & Credentials Guide (PDF)](docs/The_Hospital_Portal_Customer_Guide.pdf)**: Portal access, credentials, Arabic/English switching, and patient/staff workflows.
 - **[Non-Technical User & Patient Guide (PDF)](docs/The_Hospital_Portal_User_Guide.pdf)**: Step-by-step patient journey, appointment scheduling, and FAQ.
 - **[Technical Architecture & Workflow Specification (PDF)](docs/The_Hospital_Portal_Technical_Architecture.pdf)**: System topology, PostgreSQL RLS model, dual-mode persistence, and security controls.
 
