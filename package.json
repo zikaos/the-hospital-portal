@@ -2,11 +2,11 @@
   "name": "the-hospital-portal",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "audit:bloat": "knip"
   },
   "keywords": [],
   "author": "",

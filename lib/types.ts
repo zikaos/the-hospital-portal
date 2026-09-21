@@ -25,7 +25,7 @@ export interface PatientProfile extends Profile {
   patient_details?: Patient | null;
 }
 
-export interface Staff {
+interface Staff {
   id: string;
   title?: string | null;
   specialty?: string | null;

@@ -13,29 +13,25 @@ import {
   Role,
 } from './types';
 
-export interface AuthSession {
-  user: {
-    id: string;
-    email: string;
-    role: Role;
-    full_name: string;
-  };
+interface UserPrototype {
+  id: string;
+  email: string;
+  role: Role;
+  full_name: string;
 }
-
-export const CLINIC_STAFF_PASSCODE = process.env.NEXT_PUBLIC_STAFF_PASSCODE || 'APEX-STAFF-9021';
 
 // -----------------------------------------------------------------------------
 // PROTOTYPE CONSTANTS & IN-MEMORY STORE
 // -----------------------------------------------------------------------------
 
-const PROTOTYPE_PATIENT_USER: AuthSession['user'] = {
+const PROTOTYPE_PATIENT_USER: UserPrototype = {
   id: 'p0000000-0000-0000-0000-000000000001',
   email: 'sarah.chen@example.com',
   role: 'patient',
   full_name: 'Sarah Chen',
 };
 
-const PROTOTYPE_STAFF_USER: AuthSession['user'] = {
+const PROTOTYPE_STAFF_USER: UserPrototype = {
   id: 'd0000000-0000-0000-0000-000000000001',
   email: 'dr.vance@clinic.demo',
   role: 'staff',
@@ -278,10 +274,10 @@ let protoNotifications: Notification[] = [
 ];
 
 // -----------------------------------------------------------------------------
-// AUTH OPERATIONS (FRICTIONLESS PROTOTYPE)
+// PATIENT OPERATIONS
 // -----------------------------------------------------------------------------
 
-export async function getCurrentUser(): Promise<AuthSession['user']> {
+function getCurrentUser(): UserPrototype {
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem('portal_session');
@@ -292,46 +288,6 @@ export async function getCurrentUser(): Promise<AuthSession['user']> {
   }
   return PROTOTYPE_PATIENT_USER;
 }
-
-export async function login(
-  email?: string,
-  password?: string,
-  options?: { requireRole?: Role; passcode?: string }
-): Promise<{ user: AuthSession['user'] }> {
-  const isStaff = options?.requireRole === 'staff';
-  return { user: isStaff ? PROTOTYPE_STAFF_USER : PROTOTYPE_PATIENT_USER };
-}
-
-export async function loginStaff(
-  email?: string,
-  password?: string,
-  passcode?: string
-): Promise<{ user: AuthSession['user'] }> {
-  return { user: PROTOTYPE_STAFF_USER };
-}
-
-export async function signUp(
-  email?: string,
-  password?: string,
-  fullName?: string,
-  role: Role = 'patient',
-  staffPasscode?: string,
-  staffDetails?: { title?: string; specialty?: string }
-): Promise<{ user: AuthSession['user'] }> {
-  const targetUser = role === 'staff' ? PROTOTYPE_STAFF_USER : PROTOTYPE_PATIENT_USER;
-  if (fullName) {
-    targetUser.full_name = fullName;
-  }
-  return { user: targetUser };
-}
-
-export async function logout(): Promise<void> {
-  // Managed by AuthContext
-}
-
-// -----------------------------------------------------------------------------
-// PATIENT OPERATIONS
-// -----------------------------------------------------------------------------
 
 export async function getMyProfile(): Promise<PatientProfile> {
   if (typeof window !== 'undefined') {
@@ -477,16 +433,6 @@ export async function getMyNotifications(): Promise<Notification[]> {
 
 export async function markNotificationRead(id: string): Promise<void> {
   protoNotifications = protoNotifications.map((n) => (n.id === id ? { ...n, is_read: true } : n));
-}
-
-export async function createNotification(userId: string, message: string): Promise<void> {
-  protoNotifications.unshift({
-    id: `notif-${Date.now()}`,
-    user_id: userId,
-    message,
-    is_read: false,
-    created_at: new Date().toISOString(),
-  });
 }
 
 // -----------------------------------------------------------------------------
